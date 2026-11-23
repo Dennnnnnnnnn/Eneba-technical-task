@@ -1,0 +1,105 @@
+
+# ==========================================
+# FRONTEND — React / TypeScript / Vite
+# ==========================================
+
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+frontend/coverage/
+frontend/.vite/
+frontend/*.tsbuildinfo
+
+# Package manager logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ==========================================
+# BACKEND — Go
+# ==========================================
+
+# Compiled binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+backend/bin/
+backend/build/
+backend/tmp/
+backend/coverage/
+
+# Go workspace (if used locally)
+go.work
+go.work.sum
+
+# ==========================================
+# ENVIRONMENT VARIABLES / SECRETS
+# ==========================================
+
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+frontend/.env.local
+backend/.env.local
+
+# Private keys and certificates
+*.pem
+*.key
+
+# ==========================================
+# DATABASE
+# ==========================================
+
+*.db
+*.sqlite
+*.sqlite3
+*.sql.gz
+*.dump
+
+# Local PostgreSQL volumes
+postgres_data/
+pgdata/
+
+# ==========================================
+# DOCKER
+# ==========================================
+
+docker-compose.override.yml
+
+# ==========================================
+# EDITORS / IDE
+# ==========================================
+
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+*.swo
+*~
+
+# ==========================================
+# OPERATING SYSTEM
+# ==========================================
+
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ==========================================
+# LOGS / TEMPORARY FILES
+# ==========================================
+
+*.log
+logs/
+tmp/
+temp/
+.cache/
