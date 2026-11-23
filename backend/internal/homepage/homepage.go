@@ -85,7 +85,7 @@ func (r *Repository) Get(ctx context.Context) (Page, error) {
 	for _, s := range ids {
 		section := Section{Title: s.Title, Subtitle: s.Subtitle, Products: make([]catalog.Product, 0)}
 		rows, e := r.pool.Query(ctx, `SELECT p.id,p.slug,p.title,p.description,p.platform,p.cover_color,p.cover_image_url,
-COALESCE(MIN(o.price_cents),0)::bigint,COALESCE(MIN(o.currency),'EUR'),COUNT(o.id)::bigint
+COALESCE(MIN(o.price_cents),0)::bigint,COALESCE(MIN(o.currency),'EUR'),COUNT(o.id)::bigint,(ARRAY_AGG(o.region ORDER BY o.price_cents,o.id))[1],p.cashback_percent
 FROM homepage_section_products h JOIN products p ON p.id=h.product_id
 JOIN offers o ON o.product_id=p.id AND o.active=TRUE
 WHERE h.section_id=$1 GROUP BY p.id,h.position ORDER BY h.position`, s.ID)
@@ -94,7 +94,7 @@ WHERE h.section_id=$1 GROUP BY p.id,h.position ORDER BY h.position`, s.ID)
 		}
 		for rows.Next() {
 			var p catalog.Product
-			e = rows.Scan(&p.ID, &p.Slug, &p.Title, &p.Description, &p.Platform, &p.CoverColor, &p.CoverImageURL, &p.MinPriceCents, &p.Currency, &p.OfferCount)
+			e = rows.Scan(&p.ID, &p.Slug, &p.Title, &p.Description, &p.Platform, &p.CoverColor, &p.CoverImageURL, &p.MinPriceCents, &p.Currency, &p.OfferCount, &p.Region, &p.CashbackPercent)
 			if e != nil {
 				break
 			}

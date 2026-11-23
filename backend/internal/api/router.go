@@ -9,6 +9,7 @@ import (
 
 	"github.com/example/eneba-marketplace/backend/internal/catalog"
 	"github.com/example/eneba-marketplace/backend/internal/homepage"
+	"github.com/example/eneba-marketplace/backend/internal/shop"
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -49,8 +50,9 @@ func NewRouter(pool *pgxpool.Pool, repo Catalog, corsOrigin string) *gin.Engine 
 		if c.GetHeader("Origin") == corsOrigin {
 			c.Header("Access-Control-Allow-Origin", corsOrigin)
 			c.Header("Vary", "Origin")
-			c.Header("Access-Control-Allow-Methods", "GET, OPTIONS")
-			c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+			c.Header("Access-Control-Allow-Credentials", "true")
+			c.Header("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+			c.Header("Access-Control-Allow-Headers", "Content-Type, Authorization, Idempotency-Key")
 		}
 		if c.Request.Method == http.MethodOptions {
 			c.Status(http.StatusNoContent)
@@ -70,6 +72,29 @@ func NewRouter(pool *pgxpool.Pool, repo Catalog, corsOrigin string) *gin.Engine 
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 	v1 := router.Group("/api/v1")
+	store := shop.New(pool)
+	// Same-site session cookies + explicit Origin check on state-changing requests.
+	v1.Use(func(c *gin.Context) {
+		if c.Request.Method != "GET" && c.Request.Method != "HEAD" && c.Request.Method != "OPTIONS" {
+			if origin := c.GetHeader("Origin"); origin != "" && origin != corsOrigin {
+				c.AbortWithStatusJSON(403, gin.H{"error": "Origin not allowed"})
+				return
+			}
+		}
+		c.Next()
+	})
+	v1.POST("/auth/register", store.Register)
+	v1.POST("/auth/login", store.Login)
+	v1.POST("/auth/logout", store.Logout)
+	v1.GET("/auth/me", store.Me)
+	protected := v1.Group("")
+	protected.Use(store.Require)
+	protected.GET("/cart", store.Cart)
+	protected.POST("/cart/items", store.AddToCart)
+	protected.DELETE("/cart/items/:offerId", store.RemoveFromCart)
+	protected.POST("/checkout", store.Checkout)
+	protected.GET("/orders", store.Orders)
+	protected.GET("/orders/:id", store.Order)
 	homeRepo := homepage.NewRepository(pool)
 	v1.GET("/home", func(c *gin.Context) {
 		page, err := homeRepo.Get(c.Request.Context())
@@ -78,6 +103,52 @@ func NewRouter(pool *pgxpool.Pool, repo Catalog, corsOrigin string) *gin.Engine 
 			return
 		}
 		c.JSON(200, gin.H{"data": page})
+	})
+	// Independent content endpoints: sections are loaded separately by React.
+	v1.GET("/home/banners", func(c *gin.Context) {
+		items, err := homeRepo.Banners(c.Request.Context())
+		if err != nil {
+			c.JSON(500, gin.H{"error": "could not load banners"})
+			return
+		}
+		c.JSON(200, gin.H{"data": items})
+	})
+	v1.GET("/home/categories", func(c *gin.Context) {
+		items, err := homeRepo.Categories(c.Request.Context())
+		if err != nil {
+			c.JSON(500, gin.H{"error": "could not load categories"})
+			return
+		}
+		c.JSON(200, gin.H{"data": items})
+	})
+	v1.GET("/home/genres", func(c *gin.Context) {
+		items, err := homeRepo.Genres(c.Request.Context())
+		if err != nil {
+			c.JSON(500, gin.H{"error": "could not load genres"})
+			return
+		}
+		c.JSON(200, gin.H{"data": items})
+	})
+	v1.GET("/home/sections", func(c *gin.Context) {
+		items, err := homeRepo.SectionList(c.Request.Context())
+		if err != nil {
+			c.JSON(500, gin.H{"error": "could not load section list"})
+			return
+		}
+		c.JSON(200, gin.H{"data": items})
+	})
+	v1.GET("/home/sections/:id", func(c *gin.Context) {
+		id, err := strconv.ParseInt(c.Param("id"), 10, 64)
+		if err != nil || id < 1 {
+			c.JSON(400, gin.H{"error": "invalid section id"})
+			return
+		}
+		item, err := homeRepo.SectionByID(c.Request.Context(), id)
+		if err != nil {
+			c.JSON(404, gin.H{"error": "section not found"})
+			return
+		}
+		c.JSON(200, gin.H{"data": item})
 	})
 	v1.GET("/products", func(c *gin.Context) {
 		page, err := parsePositive(c, "page", 1)

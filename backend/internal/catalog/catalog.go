@@ -11,16 +11,18 @@ import (
 )
 
 type Product struct {
-	ID            int64  `json:"id"`
-	Slug          string `json:"slug"`
-	Title         string `json:"title"`
-	Description   string `json:"description"`
-	Platform      string `json:"platform"`
-	CoverColor    string `json:"coverColor"`
-	CoverImageURL string `json:"coverImageUrl"`
-	MinPriceCents int64  `json:"minPriceCents"`
-	Currency      string `json:"currency"`
-	OfferCount    int64  `json:"offerCount"`
+	ID              int64  `json:"id"`
+	Slug            string `json:"slug"`
+	Title           string `json:"title"`
+	Description     string `json:"description"`
+	Platform        string `json:"platform"`
+	CoverColor      string `json:"coverColor"`
+	CoverImageURL   string `json:"coverImageUrl"`
+	MinPriceCents   int64  `json:"minPriceCents"`
+	Currency        string `json:"currency"`
+	OfferCount      int64  `json:"offerCount"`
+	Region          string `json:"region"`
+	CashbackPercent int    `json:"cashbackPercent"`
 }
 
 type Offer struct {
@@ -88,11 +90,12 @@ func NormalizePagination(page, pageSize int) (int, int) {
 
 const selectProduct = `p.id,p.slug,p.title,p.description,p.platform,p.cover_color,p.cover_image_url,
  COALESCE(MIN(o.price_cents),0)::bigint AS min_price_cents,
- COALESCE(MIN(o.currency),'EUR') AS currency, COUNT(o.id)::bigint AS offer_count`
+ COALESCE(MIN(o.currency),'EUR') AS currency, COUNT(o.id)::bigint AS offer_count,
+ (ARRAY_AGG(o.region ORDER BY o.price_cents,o.id))[1] AS lowest_region, p.cashback_percent`
 
 func scanProduct(row pgx.Row) (Product, error) {
 	var p Product
-	err := row.Scan(&p.ID, &p.Slug, &p.Title, &p.Description, &p.Platform, &p.CoverColor, &p.CoverImageURL, &p.MinPriceCents, &p.Currency, &p.OfferCount)
+	err := row.Scan(&p.ID, &p.Slug, &p.Title, &p.Description, &p.Platform, &p.CoverColor, &p.CoverImageURL, &p.MinPriceCents, &p.Currency, &p.OfferCount, &p.Region, &p.CashbackPercent)
 	return p, err
 }
 
@@ -128,7 +131,7 @@ func (r *Repository) List(ctx context.Context, f Filters) (Page, error) {
 	for rows.Next() {
 		var p Product
 		var relevance float64
-		if err = rows.Scan(&p.ID, &p.Slug, &p.Title, &p.Description, &p.Platform, &p.CoverColor, &p.CoverImageURL, &p.MinPriceCents, &p.Currency, &p.OfferCount, &relevance); err != nil {
+		if err = rows.Scan(&p.ID, &p.Slug, &p.Title, &p.Description, &p.Platform, &p.CoverColor, &p.CoverImageURL, &p.MinPriceCents, &p.Currency, &p.OfferCount, &p.Region, &p.CashbackPercent, &relevance); err != nil {
 			return Page{}, fmt.Errorf("scan product: %w", err)
 		}
 		products = append(products, p)
