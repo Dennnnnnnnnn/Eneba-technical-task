@@ -77,3 +77,9 @@ Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for Neon and Render. `render.yam
 - **Full AI chat transcript or share link**: must be provided separately; summary file alone is insufficient. See [docs/AI_LOG_GUIDE.md](docs/AI_LOG_GUIDE.md).
 
 See `docs/architecture.md` for module overview and technical decisions.
+
+## Phase 6: reliability checks
+
+Run `cd backend && go test ./...` for Go security and API unit tests. Run `cd frontend && npm install && npm run build` for TypeScript and the React production bundle.
+
+A separate, **opt-in** HTTP integration test covers two-account demo checkout, digital-key uniqueness, checkout idempotency, and order isolation. Follow [docs/PHASE6_TESTING.md](docs/PHASE6_TESTING.md) before running it; the test creates users and consumes demo inventory, so use an isolated local test database.
