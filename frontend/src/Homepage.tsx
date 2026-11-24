@@ -1,5 +1,5 @@
 import {useEffect,useRef,useState,type ReactNode} from 'react';
-import {fetchHomeBanners,fetchHomeCategories,fetchHomeGenres,fetchHomeSectionList,fetchHomeSection,type HomeBanner,type HomeCategory,type HomeGenre,type HomeSection,type HomeSectionMeta,type Product} from './api';
+import {fetchHomeBanners,fetchHomeCategories,fetchHomeGenres,fetchHomeSectionList,fetchHomeSection,fetchProduct,type HomeBanner,type HomeCategory,type HomeGenre,type HomeSection,type HomeSectionMeta,type Product} from './api';
 
 const shortcutPaths:Record<string,ReactNode>={
  gamepad:<><rect x="3" y="9" width="26" height="16" rx="6"/><path d="M10 13v8m-4-4h8m9-3h.01M26 19h.01M12 9V5m0 0 3-2"/></>,
@@ -15,11 +15,30 @@ const shortcutPaths:Record<string,ReactNode>={
  video:<><rect x="4" y="7" width="24" height="18" rx="3"/><path d="m14 12 8 4-8 4v-8Z"/></>,
  calendar:<><rect x="4" y="7" width="24" height="22" rx="2"/><path d="M10 3v8m12-8v8M4 14h24"/></>
 };
+const shortcutIconFiles:Record<string,string>={
+ 'Games':'games',
+ 'Gaming eCards':'gaming-ecards',
+ 'eGift Cards':'egift-cards',
+ 'E-money':'e-money',
+ 'Steam':'steam',
+ 'Steam Gift Cards':'steam-gift-cards',
+ 'PSN':'psn',
+ 'Xbox':'xbox',
+ 'FIFA':'fifa',
+ 'Fortnite':'fortnite',
+ 'Amazon':'amazon',
+ 'Apple':'apple',
+ 'Mobile games':'mobile-games',
+ 'Spotify':'spotify',
+ 'Netflix':'netflix',
+ 'Nintendo':'nintendo',
+ 'DLCs':'dlcs',
+ 'Pre-orders':'pre-orders',
+ 'Cheap games':'cheap-games'
+};
 function ShortcutIcon({name,label}:{name:string;label:string}){
- if(label==='FIFA')return <span className="shortcut-wordmark" aria-hidden="true">FIFA</span>;
- if(label==='Fortnite')return <span className="shortcut-wordmark" aria-hidden="true">F</span>;
- if(label==='Amazon')return <span className="shortcut-wordmark amazon-mark" aria-hidden="true">a</span>;
- return <svg viewBox="0 0 32 32" width="42" height="42" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{shortcutPaths[name]??shortcutPaths.gamepad}</svg>;
+ const file=shortcutIconFiles[label];
+ return file?<img className="shortcut-svg" src={`/shortcut-icons/${file}.svg`} alt="" loading="lazy"/>:<svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">{shortcutPaths[name]??shortcutPaths.gamepad}</svg>;
 }
 const money=(cents:number,currency='EUR')=>new Intl.NumberFormat('en-IE',{style:'currency',currency}).format(cents/100);
 function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug:string)=>void;onAdd:(p:Product)=>void;onWish:(p:Product)=>void}){
@@ -32,9 +51,9 @@ function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug:string
    {product.coverImageUrl&&!failed?<img src={product.coverImageUrl} alt={`${product.title} cover`} loading="lazy" onError={()=>setFailed(true)}/>:<div className="eneba-fallback">{product.title}</div>}
    <button type="button" className="eneba-wish" aria-label={`Save ${product.title} to wishlist`} onClick={()=>onWish(product)}>♡</button>
    {cashback>0&&<span className="cashback-badge">⊕ &nbsp;CASHBACK</span>}
-   <div className="eneba-platform">▣ &nbsp;{platform}</div>
   </div>
   <div className="eneba-card-copy">
+   <div className="eneba-platform">▣ &nbsp;{platform}</div>
    <button className="eneba-title" onClick={()=>onOpen(product.slug)} title={product.title}>{product.title} ({product.platform}) Key</button>
    <div className={`eneba-region ${['GLOBAL','EUROPE','FRANCE'].includes(region)?'region-green':'region-pink'}`}>{region}</div>
    <span className="eneba-from">From</span>
@@ -67,6 +86,22 @@ function Shelf({meta,onOpen,onAdd,onWish,onAll}:{meta:HomeSectionMeta;onOpen:(s:
   <button type="button" className="outlined-button centered" onClick={onAll}>{label}</button>
  </div></section>
 }
+const RECENT_KEY='eneba-demo-recently-viewed';
+function RecentlyViewed({onOpen,onAdd,onWish}:{onOpen:(slug:string)=>void;onAdd:(p:Product)=>void;onWish:(p:Product)=>void}){
+ const [products,setProducts]=useState<Product[]>([]);
+ useEffect(()=>{
+  const controller=new AbortController();
+  let slugs:string[]=[];
+  try{const stored=JSON.parse(localStorage.getItem(RECENT_KEY)||'[]');if(Array.isArray(stored))slugs=stored.filter((v):v is string=>typeof v==='string').slice(0,12)}catch{}
+  if(slugs.length)Promise.allSettled(slugs.map(slug=>fetchProduct(slug,controller.signal))).then(rows=>{if(!controller.signal.aborted)setProducts(rows.filter((row):row is PromiseFulfilledResult<Product>=>row.status==='fulfilled').map(row=>row.value))});
+  return()=>controller.abort();
+ },[]);
+ if(!products.length)return null;
+ return <section className="recently-viewed home-shelf"><div className="container">
+  <h2 className="home-shelf-heading">Recently viewed <span className="round-info" title="Products you've opened in this browser">i</span></h2>
+  <div className="recently-track" aria-label="Recently viewed products">{products.map(p=><Card key={p.id} product={p} onOpen={onOpen} onAdd={onAdd} onWish={onWish}/>)}</div>
+ </div></section>;
+}
 function ShortcutRow({categories,onBrowse}:{categories:HomeCategory[];onBrowse:()=>void}){
  const list=useRef<HTMLDivElement>(null);const shift=(n:number)=>list.current?.scrollBy({left:n*450,behavior:'smooth'});
  return <div className="shortcuts container"><button className="shortcut-arrow" onClick={()=>shift(-1)} aria-label="Previous categories">‹</button><nav ref={list} className="shortcut-track" aria-label="Categories">{categories.map(c=><button key={c.name} className="shortcut" onClick={onBrowse}><span className="shortcut-symbol"><ShortcutIcon name={c.icon} label={c.name}/></span><span>{c.name}</span></button>)}</nav><button className="shortcut-arrow" onClick={()=>shift(1)} aria-label="Next categories">›</button></div>
@@ -81,6 +116,7 @@ export default function Homepage({onBrowse,onOpen,onAdd,onWish}:{onBrowse:()=>vo
  return <main className="eneba-home">{error&&<div className="container notice error">Homepage couldn't load: {error}. Apply migration 007 and restart the Go API.</div>}
   <div className="promo-grid">{banners.map((b,i)=><article key={b.id} className={`promo-tile promo-${i===0?'main':'small'} promo-${b.theme}`} style={b.imageUrl?{backgroundImage:`linear-gradient(95deg,rgba(24,8,68,.94),rgba(40,10,84,.28)),url("${b.imageUrl}")`}:undefined}><div className="promo-content"><span>{b.eyebrow}</span><h1>{b.title}</h1>{i===0&&<p>{b.subtitle}</p>}<button type="button" className="yellow-button" onClick={onBrowse}>{b.cta}</button></div></article>)}</div>
   <ShortcutRow categories={categories} onBrowse={onBrowse}/>
+  <RecentlyViewed onOpen={onOpen} onAdd={onAdd} onWish={onWish}/>
   {sections.map(s=><Shelf key={s.id} meta={s} onOpen={onOpen} onAdd={onAdd} onWish={onWish} onAll={onBrowse}/>)}
   <Genres genres={genres} onBrowse={onBrowse}/>
  </main>

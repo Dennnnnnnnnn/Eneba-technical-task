@@ -76,3 +76,21 @@
 .genre-glyph{font-size:40px}
 .genre-glyph img{width:40px;height:40px;object-fit:contain}
 .genre-card{min-height:155px}
+
+/* Reference-matched shortcut icons and product-card behavior (2026-11-24). */
+.shortcut-symbol{width:40px;height:40px;border:0;border-radius:0;background:transparent;color:#fff}
+.shortcut-svg{width:auto;height:32px;max-width:40px;display:block;filter:brightness(0) invert(1)}
+.shortcut{min-width:102px;gap:7px}
+.shortcut:hover .shortcut-svg{filter:brightness(0) saturate(100%) invert(76%) sepia(81%) saturate(1356%) hue-rotate(358deg) brightness(102%)}
+.eneba-art img{transition:filter .5s ease}
+.eneba-card:hover .eneba-art img,.eneba-card:focus-within .eneba-art img{filter:brightness(.68) grayscale(.18)}
+.eneba-card-copy{position:relative;z-index:1;display:flex;flex-direction:column;flex:1;transition:transform .5s ease}
+.eneba-platform{position:relative;margin-top:-25px;height:25px;flex-shrink:0;background:rgba(10,8,21,.66);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);color:#fff}
+.eneba-card-actions{position:static;height:auto;min-height:0;max-height:0;overflow:hidden;padding:0 13px;gap:8px;transform:none;opacity:0;transition:max-height .5s ease,opacity .5s ease,padding .5s ease;background:#27105e}
+.eneba-card:hover .eneba-card-actions,.eneba-card:focus-within .eneba-card-actions{transform:none;max-height:130px;padding:11px 13px 14px;opacity:1}
+.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{transform:translateY(-4px)}
+.recently-viewed{background:#4618ac;padding-top:12px}
+.recently-viewed .home-shelf-heading{margin-bottom:27px}
+.recently-track{display:flex;overflow-x:auto;gap:14px;padding:0 0 12px;scrollbar-width:thin;scrollbar-color:#aaa0d8 transparent}
+.recently-track .eneba-card{flex:0 0 clamp(155px,16.2vw,205px)}
+@media(max-width:540px){.shortcut{min-width:90px}.recently-viewed .home-shelf-heading{margin-bottom:18px}}
