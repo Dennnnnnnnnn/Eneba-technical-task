@@ -48,12 +48,14 @@ function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug:string
  const cashback=Math.round(product.minPriceCents*(product.cashbackPercent??0)/100);
  return <article className="eneba-card">
   <div className="eneba-art" style={{background:product.coverColor}}>
-   {product.coverImageUrl&&!failed?<img src={product.coverImageUrl} alt={`${product.title} cover`} loading="lazy" onError={()=>setFailed(true)}/>:<div className="eneba-fallback">{product.title}</div>}
+   <button type="button" className="eneba-cover-link" onClick={()=>onOpen(product.slug)} aria-label={`View ${product.title}`}>
+    {product.coverImageUrl&&!failed?<img src={product.coverImageUrl} alt={`${product.title} cover`} loading="lazy" onError={()=>setFailed(true)}/>:<div className="eneba-fallback">{product.title}</div>}
+   </button>
    <button type="button" className="eneba-wish" aria-label={`Save ${product.title} to wishlist`} onClick={()=>onWish(product)}>♡</button>
    {cashback>0&&<span className="cashback-badge">⊕ &nbsp;CASHBACK</span>}
   </div>
   <div className="eneba-card-copy">
-   <div className="eneba-platform">▣ &nbsp;{platform}</div>
+   <div className="eneba-platform"><PlatformMark platform={platform}/> {platform}</div>
    <button className="eneba-title" onClick={()=>onOpen(product.slug)} title={product.title}>{product.title} ({product.platform}) Key</button>
    <div className={`eneba-region ${['GLOBAL','EUROPE','FRANCE'].includes(region)?'region-green':'region-pink'}`}>{region}</div>
    <span className="eneba-from">From</span>
@@ -62,6 +64,14 @@ function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug:string
    <div className="eneba-card-actions"><button type="button" className="card-add" onClick={()=>onAdd(product)}>Add to cart</button><button type="button" className="card-offers" onClick={()=>onOpen(product.slug)}>View offers</button></div>
   </div>
  </article>
+}
+function PlatformMark({platform}:{platform:string}){
+ const kind=platform.toLowerCase();
+ if(kind.includes('xbox'))return <svg className="platform-logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="currentColor"/><path d="M7 7c5 2 8 5 9 7 1-2 4-5 9-7M6 25c1-5 5-10 10-13 5 3 9 8 10 13" stroke="#161326" strokeWidth="2.8" fill="none"/></svg>;
+ if(kind.includes('steam')||kind==='pc')return <svg className="platform-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2"/><circle cx="21" cy="11" r="4" stroke="currentColor" strokeWidth="2"/><path d="M5 19 13 23 19 15" stroke="currentColor" strokeWidth="2.5"/><circle cx="11" cy="23" r="3" fill="currentColor"/></svg>;
+ if(kind.includes('psn')||kind.includes('playstation')||kind.includes('ps5'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M14 2c8 1 12 4 12 10 0 4-3 5-7 4V8c0-1-1-2-2-2v23l-5-2V2h2Zm-4 16v6l-8-2v-3l8-3Zm9 2 11-4v5l-11 4v-5Z"/></svg>;
+ if(kind.includes('windows')||kind.includes('store'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M2 5 15 3v12H2V5Zm16-2 12-2v14H18V3ZM2 18h13v12L2 28V18Zm16 0h12v14l-12-2V18Z"/></svg>;
+ return <svg className="platform-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="5" stroke="currentColor" strokeWidth="2"/><path d="M16 6v20" stroke="currentColor" strokeWidth="2"/></svg>
 }
 function GiftCardTile({product,onOpen}:{product:Product;onOpen:(slug:string)=>void}){
  const [failed,setFailed]=useState(false);
@@ -114,7 +124,7 @@ export default function Homepage({onBrowse,onOpen,onAdd,onWish}:{onBrowse:()=>vo
  const [banners,setBanners]=useState<HomeBanner[]>([]);const [categories,setCategories]=useState<HomeCategory[]>([]);const [sections,setSections]=useState<HomeSectionMeta[]>([]);const [genres,setGenres]=useState<HomeGenre[]>([]);const [error,setError]=useState('');
  useEffect(()=>{const c=new AbortController();Promise.all([fetchHomeBanners(c.signal),fetchHomeCategories(c.signal),fetchHomeSectionList(c.signal),fetchHomeGenres(c.signal)]).then(([b,cats,s,g])=>{setBanners(b);setCategories(cats);setSections(s);setGenres(g)}).catch(e=>{if(!c.signal.aborted)setError(String(e))});return()=>c.abort()},[]);
  return <main className="eneba-home">{error&&<div className="container notice error">Homepage couldn't load: {error}. Apply migration 007 and restart the Go API.</div>}
-  <div className="promo-grid">{banners.map((b,i)=><article key={b.id} className={`promo-tile promo-${i===0?'main':'small'} promo-${b.theme}`} style={b.imageUrl?{backgroundImage:`linear-gradient(95deg,rgba(24,8,68,.94),rgba(40,10,84,.28)),url("${b.imageUrl}")`}:undefined}><div className="promo-content"><span>{b.eyebrow}</span><h1>{b.title}</h1>{i===0&&<p>{b.subtitle}</p>}<button type="button" className="yellow-button" onClick={onBrowse}>{b.cta}</button></div></article>)}</div>
+  <div className="promo-grid" aria-label="Featured promotions">{banners.map((b,i)=><button key={b.id} type="button" className={`promo-tile promo-${i===0?'main':'small'}`} onClick={onBrowse} aria-label={b.title} title={`${b.title} — browse demo products`} style={b.imageUrl?{backgroundImage:`url("${b.imageUrl}")`}:undefined}>{!b.imageUrl&&<span className="promo-fallback">{b.title}</span>}</button>)}</div>
   <ShortcutRow categories={categories} onBrowse={onBrowse}/>
   <RecentlyViewed onOpen={onOpen} onAdd={onAdd} onWish={onWish}/>
   {sections.map(s=><Shelf key={s.id} meta={s} onOpen={onOpen} onAdd={onAdd} onWish={onWish} onAll={onBrowse}/>)}

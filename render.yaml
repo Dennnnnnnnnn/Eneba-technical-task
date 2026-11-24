@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: eneba-internship-demo
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/live
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: GIN_MODE
+        value: release
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: STATIC_DIR
+        value: /app/public

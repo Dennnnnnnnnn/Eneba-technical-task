@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/example/eneba-marketplace/backend/internal/catalog"
@@ -43,6 +45,18 @@ func parseCents(c *gin.Context, name string) (*int64, error) {
 	return &v, nil
 }
 
+// allowedMutationOrigin allows the app's own deployed origin and the explicit
+// development CORS origin. This keeps same-origin authentication working on
+// Render while rejecting unrelated cross-origin browser mutations.
+func allowedMutationOrigin(origin string, request *http.Request, corsOrigin string) bool {
+	if origin == "" || origin == corsOrigin {
+		return true
+	}
+	parsed, err := url.Parse(origin)
+	return err == nil && (parsed.Scheme == "http" || parsed.Scheme == "https") &&
+		strings.EqualFold(parsed.Host, request.Host) && parsed.User == nil && parsed.Path == "" && parsed.RawQuery == ""
+}
+
 func NewRouter(pool *pgxpool.Pool, repo Catalog, corsOrigin string) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.Recovery())
@@ -76,7 +90,7 @@ func NewRouter(pool *pgxpool.Pool, repo Catalog, corsOrigin string) *gin.Engine 
 	// Same-site session cookies + explicit Origin check on state-changing requests.
 	v1.Use(func(c *gin.Context) {
 		if c.Request.Method != "GET" && c.Request.Method != "HEAD" && c.Request.Method != "OPTIONS" {
-			if origin := c.GetHeader("Origin"); origin != "" && origin != corsOrigin {
+			if origin := c.GetHeader("Origin"); !allowedMutationOrigin(origin, c.Request, corsOrigin) {
 				c.AbortWithStatusJSON(403, gin.H{"error": "Origin not allowed"})
 				return
 			}

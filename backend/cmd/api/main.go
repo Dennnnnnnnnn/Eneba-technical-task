@@ -14,6 +14,7 @@ import (
 	"github.com/example/eneba-marketplace/backend/internal/catalog"
 	"github.com/example/eneba-marketplace/backend/internal/config"
 	"github.com/example/eneba-marketplace/backend/internal/database"
+	"github.com/example/eneba-marketplace/backend/internal/webapp"
 )
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
-		Handler:           api.NewRouter(pool, catalog.NewRepository(pool), cfg.CORSOrigin),
+		Handler:           webapp.Wrap(api.NewRouter(pool, catalog.NewRepository(pool), cfg.CORSOrigin), os.Getenv("STATIC_DIR")),
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 	go func() {

@@ -157,3 +157,26 @@ html,body,.site-shell{background:#4618AC}
 .search-icon{display:flex;align-items:center;justify-content:center;line-height:1}
 .heart-header{display:flex;align-items:center;justify-content:center}
 .gta-menu-vi{height:19px;width:auto;vertical-align:middle;margin-left:2px;object-fit:contain}
+
+/* Phase 5: language selector, native flag disc, and modal. */
+.site-header{background:#4618AC}.locale{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.locale-flag{display:inline-block;width:17px;height:17px;border-radius:50%;background:linear-gradient(to bottom,#fdb913 0 33.333%,#006a44 33.333% 66.666%,#c1272d 66.666% 100%);box-shadow:0 0 0 1px #ffffff30;flex:none}
+.nav-links .black-week{background:linear-gradient(180deg,#230507 0%,#530b11 58%,#a21c15 100%);border:1px solid #cf3232;color:#fff;border-radius:6px;box-shadow:inset 0 1px 4px #ec5b5366,0 0 8px #150016;letter-spacing:.02em;font-size:13px;font-weight:900;padding:9px 15px}
+.nav-links .black-week:hover{background:#2f0b73;border-color:#ffce00;color:#ffce00}
+.locale-overlay{position:fixed;inset:0;z-index:1000;background:#110625a8;display:grid;place-items:center;padding:16px}
+.locale-dialog{position:relative;width:min(100%,420px);background:#4618AC;color:#fff;padding:38px 38px 30px;box-shadow:0 20px 55px #130728c2;font-size:14px}
+.locale-dialog h2{font-size:23px;line-height:1.25;font-weight:850;margin:0 0 24px}.locale-dialog p{color:#ddc9f5;line-height:1.5;margin:0 0 24px}
+.locale-close{position:absolute;right:13px;top:12px;color:#fff;background:transparent;border:0;font-size:30px;line-height:1}
+.locale-dialog label{display:flex;flex-direction:column;gap:10px;font-size:12px;font-weight:700;margin-bottom:22px}
+.locale-dialog select{height:44px;border:1px solid #270d76;border-radius:0;background:#38128f;color:#f4ebff;padding:0 12px;outline-offset:3px}
+.locale-dialog .locale-note{font-size:11px;margin:0 0 17px}
+.locale-actions{display:flex;justify-content:flex-end;gap:17px}
+.locale-actions button{min-width:100px;height:37px;font-size:13px;font-weight:800}
+.locale-cancel{border:1px solid white;background:transparent;color:white}.locale-save{border:1px solid #ffce00;background:#ffce00;color:#22114c}
+.locale-actions button:hover{filter:brightness(.92)}
+@media(max-width:540px){.topbar .locale{display:inline-flex}.locale-dialog{padding:32px 24px 24px}}
+
+.flag-germany{background:linear-gradient(to bottom,#111 0 33.333%,#d00 33.333% 66.666%,#ffce00 66.666% 100%)}
+.flag-united-kingdom{background:linear-gradient(135deg,#102e75 42%,#fff 42% 47%,#b51225 47% 53%,#fff 53% 58%,#102e75 58%)}
+.flag-united-states{background:repeating-linear-gradient(to bottom,#b22234 0 2px,#fff 2px 4px);position:relative}
+.flag-united-states::before{content:"";position:absolute;left:0;top:0;width:45%;height:53%;background:#3c3b6e;border-radius:8px 0 0 0}
