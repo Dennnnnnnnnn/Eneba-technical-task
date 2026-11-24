@@ -1,0 +1,5 @@
+-- Banner artwork URLs supplied by the user as a reference; promotional artwork remains hosted by Eneba.
+UPDATE homepage_banners SET image_url = 'https://imgproxy.eneba.games/u22dCWtA5yp1fXZY9dmpfj6YYnBdn2UL49jikbfOzCI/c:1500:400:nowe:150:0/czM6Ly9zbGlkZXIu/ZW5lYmEuZ2FtZXMv/Rm1ZeWMzbEM5YkRw/ZWItNjRjVlY3dFh4/R3NTVTk0YWRaeWwx/RWZsZnNUVS5qcGc' WHERE position = 1;
+UPDATE homepage_banners SET image_url = 'https://imgproxy.eneba.games/NdWRl8KFCYd__CkR1oatIRC5sPvMMYgNJyvVLPmOXB0/c:200:400:nowe:1800:0/czM6Ly9zbGlkZXIu/ZW5lYmEuZ2FtZXMv/Tm1OSTF1bm42VHF1/UDZrMHZBN1JJMzVS/YjE3ZkNNcVNqckNS/MmdweWlpcy5qcGc' WHERE position = 2;
+UPDATE homepage_banners SET image_url = 'https://imgproxy.eneba.games/qdQEOCoqbqM3L9oJR9IoCG7cHJuH774Ul_ul8rmrSqg/c:200:400:nowe:1800:0/czM6Ly9zbGlkZXIu/ZW5lYmEuZ2FtZXMv/MVFpZG15NHhBWkxU/QkZYenBoZWlZR2t6/V1FqUHIwZ3ZiZlZX/SFowbTQyNC5qcGc' WHERE position = 3;
+UPDATE homepage_banners SET image_url = 'https://imgproxy.eneba.games/IEP70IJnLy3yQEudqGb9S04n957i0RK22sZynJVcFKo/c:200:400:nowe:1800:0/czM6Ly9zbGlkZXIu/ZW5lYmEuZ2FtZXMv/Y0V3MXowbm5QU01H/endTSi12a2VIZUNt/eXFVTUZ5NVIwb2hY/bmtLVnB6TS5qcGc' WHERE position = 4;

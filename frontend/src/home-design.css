@@ -94,3 +94,31 @@
 .recently-track{display:flex;overflow-x:auto;gap:14px;padding:0 0 12px;scrollbar-width:thin;scrollbar-color:#aaa0d8 transparent}
 .recently-track .eneba-card{flex:0 0 clamp(155px,16.2vw,205px)}
 @media(max-width:540px){.shortcut{min-width:90px}.recently-viewed .home-shelf-heading{margin-bottom:18px}}
+
+/* Phase 5: reference-sized photographic banners, with no text painted over artwork. */
+.promo-grid{grid-template-columns:minmax(0,7fr) repeat(3,minmax(0,1fr));gap:0;padding:0;max-width:none}
+.promo-tile{height:clamp(200px,26.6667vw,400px);appearance:none;border:0;border-radius:0;display:block;cursor:pointer;background-size:cover;background-repeat:no-repeat;background-position:center;isolation:auto;padding:0}
+.promo-tile::before,.promo-tile::after{display:none!important}
+.promo-main{background-size:cover;background-position:center}
+.promo-small{background-size:cover;background-position:center}
+.promo-fallback{display:grid;place-items:center;width:100%;height:100%;font-weight:900;padding:10px;background:linear-gradient(120deg,#29105f,#4b19a9)}
+.promo-tile:focus-visible{outline:3px solid #ffce00;outline-offset:-3px;z-index:2}
+/* Keep a single moving block containing the platform strip, price and purchase buttons.
+   Sliding the whole block upwards reveals actions beneath cashback. */
+.eneba-card{position:relative;overflow:hidden}
+.eneba-card-copy{flex:none!important;height:198px!important;transform:translateY(0)!important;transition:translate .5s cubic-bezier(.2,.7,.1,1)!important;z-index:3;background:#27105e}
+.eneba-card .eneba-card-actions{position:absolute!important;top:100%!important;bottom:auto!important;left:0;right:0;display:flex!important;flex-direction:column;gap:7px;height:108px!important;max-height:none!important;padding:9px 12px!important;opacity:1!important;overflow:visible!important;background:#27105e;transform:none!important}
+.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -108px!important}
+.eneba-platform{height:26px!important;margin-top:-26px!important;position:relative!important;z-index:4;background:rgba(17,14,23,.7)!important;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);font-size:11px}
+.eneba-card .eneba-cashback{margin-top:auto;margin-bottom:12px}
+.eneba-cover-link{display:block;position:absolute;inset:0;appearance:none;border:0;padding:0;background:transparent;cursor:pointer;width:100%;height:100%}
+.eneba-cover-link img{width:100%;height:100%;object-fit:cover;transition:filter .5s}
+.eneba-cover-link:focus-visible{outline:3px solid #ffce00;outline-offset:-3px}
+.eneba-card:hover .eneba-cover-link img,.eneba-card:focus-within .eneba-cover-link img{filter:brightness(.70) grayscale(.24)}
+.eneba-wish{z-index:5}
+.platform-mark{display:inline-grid;place-items:center;width:16px;height:16px;font-weight:800;border:1px solid #fff9;border-radius:50%;margin-right:4px}
+@media(max-width:620px){.promo-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.promo-main{height:220px;grid-column:1/-1}.promo-small{height:175px}.eneba-card-copy{height:198px!important}}
+@media(hover:none){.eneba-card{overflow:hidden!important}.eneba-card-copy{translate:0 0!important}.eneba-card .eneba-card-actions{position:relative!important;top:auto!important;height:auto!important}.eneba-card-copy{height:auto!important}.eneba-cover-link{inset:0}}
+@media(prefers-reduced-motion:reduce){.eneba-card-copy{transition:none!important}}
+
+.platform-logo{width:15px;height:15px;vertical-align:-3px;margin-right:5px;display:inline-block;flex:none}
