@@ -1,0 +1,7 @@
+-- Correct artwork assignments without touching purchases or seller prices.
+-- Provided external Eneba images; their future availability depends on the host.
+UPDATE products SET cover_image_url = 'https://imgproxy.eneba.games/4LHm5BJU_8H-aEByHOXuN8aVIyVFUt12h07NqD1Qr30/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy91/dTUxNnZkaW5KM3pV/aWxYU1JIYkNQQUJD/QXRCcmlxNm1Zai1q/aVBvelhNLmpwZWc' WHERE slug = 'psn-100-card';
+UPDATE products SET cover_image_url = 'https://imgproxy.eneba.games/2da2szcvo6SCbvUjVN4V9YANXlmQcnaKreMgVum3T3U/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy94/UGIwR3pMWktxOUJN/VUVDeDV3d2E3RnJX/X3hBczB1LWpEazlv/c3RrVW9zLmpwZWc' WHERE slug = 'psn-10-card';
+UPDATE products SET cover_image_url = 'https://imgproxy.eneba.games/2da2szcvo6SCbvUjVN4V9YANXlmQcnaKreMgVum3T3U/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy94/UGIwR3pMWktxOUJN/VUVDeDV3d2E3RnJX/X3hBczB1LWpEazlv/c3RrVW9zLmpwZWc' WHERE slug = 'psn-10-gbp-card';
+UPDATE products SET cover_image_url = 'https://imgproxy.eneba.games/gJrNssRa3stNvSW0JfJyV7TFMfIRcC3W0cWJyzWzU7w/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9F/T0FOdTQxZndJdVdJ/QS11YXZ0bkVqdU9D/a2g4Q2NCajVJV2lL/TFpCVXdvLmpwZw' WHERE slug = 'roblox-1000-card';
+UPDATE products SET cover_image_url = 'https://imgproxy.eneba.games/gJrNssRa3stNvSW0JfJyV7TFMfIRcC3W0cWJyzWzU7w/rs:fit:300/ar:1/czM6Ly9wcm9kdWN0/cy5lbmViYS5nYW1l/cy9wcm9kdWN0cy9F/T0FOdTQxZndJdVdJ/QS11YXZ0bkVqdU9D/a2g4Q2NCajVJV2lL/TFpCVXdvLmpwZw' WHERE slug = 'roblox-200-card';
