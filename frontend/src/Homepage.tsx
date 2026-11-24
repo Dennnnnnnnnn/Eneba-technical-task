@@ -1,3 +1,4 @@
+import {HeartIcon} from './UiIcons';
 import {useEffect,useRef,useState,type ReactNode} from 'react';
 import {fetchHomeBanners,fetchHomeCategories,fetchHomeGenres,fetchHomeSectionList,fetchHomeSection,fetchProduct,type HomeBanner,type HomeCategory,type HomeGenre,type HomeSection,type HomeSectionMeta,type Product} from './api';
 
@@ -41,9 +42,9 @@ function ShortcutIcon({name,label}:{name:string;label:string}){
  return file?<img className="shortcut-svg" src={`/shortcut-icons/${file}.svg`} alt="" loading="lazy"/>:<svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">{shortcutPaths[name]??shortcutPaths.gamepad}</svg>;
 }
 const money=(cents:number,currency='EUR')=>new Intl.NumberFormat('en-IE',{style:'currency',currency}).format(cents/100);
-function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug:string)=>void;onAdd:(p:Product)=>void;onWish:(p:Product)=>void}){
+export function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug:string)=>void;onAdd:(p:Product)=>void;onWish:(p:Product)=>void}){
  const [failed,setFailed]=useState(false);
- const platform=product.platform==='PC'?'Steam':product.platform==='Xbox'?'Xbox Live':product.platform==='Switch'?'Nintendo':product.platform==='Gift Card'?'Gift Card':'PSN';
+ const platform=product.platform==='PC'?'Steam':product.platform==='Xbox'?'Xbox Live':product.platform==='Switch'?'Nintendo':product.platform==='Gift Card'?(product.title.toLowerCase().includes('roblox')?'Roblox':'Gift Card'):product.platform==='Windows'?'Windows Store':product.platform==='PlayStation'?'PSN':product.platform;
  const region=product.region==='EU'?'EUROPE':product.region==='US'?'UNITED STATES':product.region;
  const cashback=Math.round(product.minPriceCents*(product.cashbackPercent??0)/100);
  return <article className="eneba-card">
@@ -51,7 +52,7 @@ function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug:string
    <button type="button" className="eneba-cover-link" onClick={()=>onOpen(product.slug)} aria-label={`View ${product.title}`}>
     {product.coverImageUrl&&!failed?<img src={product.coverImageUrl} alt={`${product.title} cover`} loading="lazy" onError={()=>setFailed(true)}/>:<div className="eneba-fallback">{product.title}</div>}
    </button>
-   <button type="button" className="eneba-wish" aria-label={`Save ${product.title} to wishlist`} onClick={()=>onWish(product)}>♡</button>
+   <button type="button" className="eneba-wish" aria-label={`Save ${product.title} to wishlist`} onClick={()=>onWish(product)}><HeartIcon width={23} height={23}/></button>
    {cashback>0&&<span className="cashback-badge">⊕ &nbsp;CASHBACK</span>}
   </div>
   <div className="eneba-card-copy">
@@ -70,6 +71,7 @@ function PlatformMark({platform}:{platform:string}){
  if(kind.includes('xbox'))return <svg className="platform-logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="currentColor"/><path d="M7 7c5 2 8 5 9 7 1-2 4-5 9-7M6 25c1-5 5-10 10-13 5 3 9 8 10 13" stroke="#161326" strokeWidth="2.8" fill="none"/></svg>;
  if(kind.includes('steam')||kind==='pc')return <svg className="platform-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2"/><circle cx="21" cy="11" r="4" stroke="currentColor" strokeWidth="2"/><path d="M5 19 13 23 19 15" stroke="currentColor" strokeWidth="2.5"/><circle cx="11" cy="23" r="3" fill="currentColor"/></svg>;
  if(kind.includes('psn')||kind.includes('playstation')||kind.includes('ps5'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M14 2c8 1 12 4 12 10 0 4-3 5-7 4V8c0-1-1-2-2-2v23l-5-2V2h2Zm-4 16v6l-8-2v-3l8-3Zm9 2 11-4v5l-11 4v-5Z"/></svg>;
+ if(kind.includes('roblox'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M9 2 30 9 23 30 2 23 9 2Zm6 9-4 6 6 4 4-6-6-4Z"/></svg>;
  if(kind.includes('windows')||kind.includes('store'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M2 5 15 3v12H2V5Zm16-2 12-2v14H18V3ZM2 18h13v12L2 28V18Zm16 0h12v14l-12-2V18Z"/></svg>;
  return <svg className="platform-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="5" stroke="currentColor" strokeWidth="2"/><path d="M16 6v20" stroke="currentColor" strokeWidth="2"/></svg>
 }
