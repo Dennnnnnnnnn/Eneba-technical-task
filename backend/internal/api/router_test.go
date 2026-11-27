@@ -79,3 +79,44 @@ func TestSameOriginAcceptedOnDeployedHost(t *testing.T) {
 		t.Fatal("foreign origin accepted")
 	}
 }
+
+func TestOriginValidationCases(t *testing.T) {
+	req := httptest.NewRequest("POST", "https://demo.onrender.com/api/v1/checkout", nil)
+	cases := []struct {
+		origin  string
+		allowed bool
+	}{
+		{"https://demo.onrender.com", true},
+		{"https://attacker.example", false},
+		{"https://demo.onrender.com.attacker.example", false},
+		{"https://demo.onrender.com:444", false},
+		{"https://demo.onrender.com/extra", false},
+		{"http://localhost:5173", true},
+		{"null", false},
+	}
+	for _, tc := range cases {
+		if got := allowedMutationOrigin(tc.origin, req, "http://localhost:5173"); got != tc.allowed {
+			t.Errorf("origin %q: got %t want %t", tc.origin, got, tc.allowed)
+		}
+	}
+}
+
+func TestAnonymousCheckoutDeniedBeforeDBAccess(t *testing.T) {
+	router := NewRouter(nil, &fakeCatalog{}, "http://localhost:5173")
+	for _, path := range []string{"/api/v1/cart", "/api/v1/orders", "/api/v1/orders/123"} {
+		recorder := httptest.NewRecorder()
+		router.ServeHTTP(recorder, httptest.NewRequest("GET", path, nil))
+		if recorder.Code != http.StatusUnauthorized {
+			t.Errorf("%s: got %d want 401", path, recorder.Code)
+		}
+	}
+	for _, path := range []string{"/api/v1/checkout", "/api/v1/cart/items"} {
+		recorder := httptest.NewRecorder()
+		request := httptest.NewRequest("POST", path, strings.NewReader("{}"))
+		request.Header.Set("Origin", "http://localhost:5173")
+		router.ServeHTTP(recorder, request)
+		if recorder.Code != http.StatusUnauthorized {
+			t.Errorf("%s: got %d want 401", path, recorder.Code)
+		}
+	}
+}

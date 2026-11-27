@@ -250,3 +250,11 @@ html,body,.site-shell{background:#4618AC}
 @media(max-width:1080px){.store-results .cards-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.checkout-header-inner{gap:12px}.checkout-steps{gap:6px}.inspired-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:790px){.checkout-layout{grid-template-columns:1fr}.checkout-summary{position:static}.checkout-steps>span{font-size:0}.checkout-steps>span b{font-size:12px}.checkout-steps{max-width:230px}.inspired-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.store-results .cards-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.checkout-header-inner{min-height:68px;gap:8px}.checkout-header .eneba-brand,.checkout-header .eneba-brand img{width:96px}.checkout-header .locale{font-size:10px}.checkout-page{padding-top:22px}.checkout-item{gap:10px}.checkout-thumb{width:56px;min-width:56px;height:81px}.checkout-item-end{min-width:60px}.checkout-item .cart-info h3{font-size:12px}.inspired-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.inspired-section{padding:12px}.store-results .cards-grid{gap:9px}.support-panel{padding:15px}.checkout-steps{max-width:116px}}
+
+/* Auto-dismiss notification: anchored in viewport; users never need to close it. */
+.toast-floating{position:fixed;top:92px;right:20px;left:auto;bottom:auto;width:min(420px,calc(100vw - 32px));max-width:420px;margin:0;padding:14px 18px;border:1px solid rgba(255,255,255,.25);border-radius:8px;box-shadow:0 12px 35px rgba(18,5,49,.35);z-index:3000;animation:toast-enter .18s ease-out}
+.toast-success{background:#216b47;color:#fff}
+.toast-error{background:#9f3045;color:#fff}
+.toast-floating button{margin-left:12px;cursor:pointer}
+@keyframes toast-enter{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){.toast-floating{animation:none}}

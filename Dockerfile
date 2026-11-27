@@ -8,9 +8,10 @@ RUN npm run build
 
 FROM golang:1.25-alpine AS backend
 WORKDIR /src/backend
-COPY backend/go.mod ./
-RUN go mod download
 COPY backend/ ./
+# Normalize stale module metadata in the container to avoid Render build failures.
+# Developers should also run Go 1.25 `go mod tidy` locally and commit go.mod/go.sum.
+RUN go mod tidy && go mod tidy -diff && go mod download
 RUN CGO_ENABLED=0 go build -trimpath -o /out/api ./cmd/api && \
     CGO_ENABLED=0 go build -trimpath -o /out/migrate ./cmd/migrate
 
