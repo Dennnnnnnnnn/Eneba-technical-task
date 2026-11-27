@@ -42,9 +42,12 @@ function ShortcutIcon({name,label}:{name:string;label:string}){
  return file?<img className="shortcut-svg" src={`/shortcut-icons/${file}.svg`} alt="" loading="lazy"/>:<svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">{shortcutPaths[name]??shortcutPaths.gamepad}</svg>;
 }
 const money=(cents:number,currency='EUR')=>new Intl.NumberFormat('en-IE',{style:'currency',currency}).format(cents/100);
+const platformIconSrc:Record<string,string>={steam:'https://imgproxy.eneba.games/011HptuJ6mQjLjVA89DexfMdoVI4RJAdrP-ZT1sa1GQ/f:png/rs:fit:32:0/aHR0cHM6Ly9wcm9k/dWN0cy5lbmViYS5n/YW1lcy9wcm9kdWN0cy9TdGVhbSBHaWZ0/IENhcmQtMTY4MTM2/NTMzNi5zdmc',xbox:'https://imgproxy.eneba.games/lYI6BC3pSz6EVDDyZ0Ag1g4aKll8vvWgYB4IahIkkA4/f:png/rs:fit:32:0/aHR0cHM6Ly9wcm9k/dWN0cy5lbmViYS5nYW1lcy9kcm1zL3Yx/L3hib3guc3Zn',nintendo:'https://imgproxy.eneba.games/rzc2XKIBu7wiRednxrje864f8Cw94wVeuvw2yF0qkDQ/f:png/rs:fit:32:0/aHR0cHM6Ly9wcm9k/dWN0cy5lbmViYS5nYW1lcy9kcm1zL3Yx/L25pbnRlbmRvLnN2/Zw',psn:'https://imgproxy.eneba.games/kZu0gbc06hd1gywXD-Qq7ero1K5JBfWvHKVPHFpHjlk/f:png/rs:fit:32:0/aHR0cHM6Ly9wcm9k/dWN0cy5lbmViYS5nYW1lcy9kcm1zL3Yx/L3Bzbi5zdmc'};
+function CashbackIcon(){return <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g clipPath="url(#cashbackBadgeClip)"><path d="M6.55768 14.5095C8.12445 14.8566 9.76387 14.6269 11.1749 13.8626C12.586 13.0983 13.674 11.8506 14.2392 10.3487C14.8044 8.84672 14.8088 7.1913 14.2517 5.68633C13.6946 4.18137 12.6134 2.92785 11.2065 2.15593C9.79954 1.384 8.1614 1.14548 6.59277 1.48414C5.02415 1.8228 3.6303 2.71594 2.66718 3.99953C1.70407 5.28313 1.23625 6.87109 1.34969 8.47182C1.46308 10.0726 2.15012 11.5787 3.28463 12.7137L4.37371 13.8028M1.47198 13.8013H4.37233V10.901" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/><path d="M8 5.33398V8.00065V10.6673" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/><path d="M5.33301 8H10.6663" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/></g><defs><clipPath id="cashbackBadgeClip"><rect width="16" height="16" fill="white"/></clipPath></defs></svg>}
 export function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug:string)=>void;onAdd:(p:Product)=>void;onWish:(p:Product)=>void}){
  const [failed,setFailed]=useState(false);
- const platform=product.platform==='PC'?'Steam':product.platform==='Xbox'?'Xbox Live':product.platform==='Switch'?'Nintendo':product.platform==='Gift Card'?(product.title.toLowerCase().includes('roblox')?'Roblox':'Gift Card'):product.platform==='Windows'?'Windows Store':product.platform==='PlayStation'?'PSN':product.platform;
+ const lowerTitle=product.title.toLowerCase();
+ const platform=product.platform==='PC'?'Steam':product.platform==='Xbox'?'Xbox Live':product.platform==='Switch'?'Nintendo':product.platform==='Gift Card'?(lowerTitle.includes('roblox')?'Roblox':'Gift Card'):product.platform==='Windows'?'Windows Store':product.platform==='PlayStation'?'PSN':product.platform;
  const region=product.region==='EU'?'EUROPE':product.region==='US'?'UNITED STATES':product.region;
  const cashback=Math.round(product.minPriceCents*(product.cashbackPercent??0)/100);
  return <article className="eneba-card">
@@ -53,7 +56,7 @@ export function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug
     {product.coverImageUrl&&!failed?<img src={product.coverImageUrl} alt={`${product.title} cover`} loading="lazy" onError={()=>setFailed(true)}/>:<div className="eneba-fallback">{product.title}</div>}
    </button>
    <button type="button" className="eneba-wish" aria-label={`Save ${product.title} to wishlist`} onClick={()=>onWish(product)}><HeartIcon width={23} height={23}/></button>
-   {cashback>0&&<span className="cashback-badge">⊕ &nbsp;CASHBACK</span>}
+   {cashback>0&&<span className="cashback-badge"><CashbackIcon/> <span>CASHBACK</span></span>}
   </div>
   <div className="eneba-card-copy">
    <div className="eneba-platform"><PlatformMark platform={platform}/> {platform}</div>
@@ -61,16 +64,17 @@ export function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug
    <div className={`eneba-region ${['GLOBAL','EUROPE','FRANCE'].includes(region)?'region-green':'region-pink'}`}>{region}</div>
    <span className="eneba-from">From</span>
    <div className="eneba-price">{money(product.minPriceCents,product.currency)} <span className="round-info" title="Price from the cheapest seller">i</span></div>
-   <div className="eneba-cashback">{cashback>0?`Cashback: ${money(cashback,product.currency)}`:'Demo digital key'}</div>
+   <div className="eneba-cashback">{cashback>0?<><span className="cashback-inline-icon"><CashbackIcon/></span>Cashback: {money(cashback,product.currency)}</>:'Demo digital key'}</div>
    <div className="eneba-card-actions"><button type="button" className="card-add" onClick={()=>onAdd(product)}>Add to cart</button><button type="button" className="card-offers" onClick={()=>onOpen(product.slug)}>View offers</button></div>
   </div>
  </article>
 }
 function PlatformMark({platform}:{platform:string}){
  const kind=platform.toLowerCase();
- if(kind.includes('xbox'))return <svg className="platform-logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="currentColor"/><path d="M7 7c5 2 8 5 9 7 1-2 4-5 9-7M6 25c1-5 5-10 10-13 5 3 9 8 10 13" stroke="#161326" strokeWidth="2.8" fill="none"/></svg>;
- if(kind.includes('steam')||kind==='pc')return <svg className="platform-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2"/><circle cx="21" cy="11" r="4" stroke="currentColor" strokeWidth="2"/><path d="M5 19 13 23 19 15" stroke="currentColor" strokeWidth="2.5"/><circle cx="11" cy="23" r="3" fill="currentColor"/></svg>;
- if(kind.includes('psn')||kind.includes('playstation')||kind.includes('ps5'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M14 2c8 1 12 4 12 10 0 4-3 5-7 4V8c0-1-1-2-2-2v23l-5-2V2h2Zm-4 16v6l-8-2v-3l8-3Zm9 2 11-4v5l-11 4v-5Z"/></svg>;
+ if(kind.includes('xbox'))return <img className="platform-logo platform-logo-image" src={platformIconSrc.xbox} alt="" loading="lazy" aria-hidden="true"/>;
+ if(kind.includes('steam')||kind==='pc')return <img className="platform-logo platform-logo-image" src={platformIconSrc.steam} alt="" loading="lazy" aria-hidden="true"/>;
+ if(kind.includes('nintendo')||kind.includes('switch'))return <img className="platform-logo platform-logo-image" src={platformIconSrc.nintendo} alt="" loading="lazy" aria-hidden="true"/>;
+ if(kind.includes('psn')||kind.includes('playstation')||kind.includes('ps5'))return <img className="platform-logo platform-logo-image" src={platformIconSrc.psn} alt="" loading="lazy" aria-hidden="true"/>;
  if(kind.includes('roblox'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M9 2 30 9 23 30 2 23 9 2Zm6 9-4 6 6 4 4-6-6-4Z"/></svg>;
  if(kind.includes('windows')||kind.includes('store'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M2 5 15 3v12H2V5Zm16-2 12-2v14H18V3ZM2 18h13v12L2 28V18Zm16 0h12v14l-12-2V18Z"/></svg>;
  return <svg className="platform-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="5" stroke="currentColor" strokeWidth="2"/><path d="M16 6v20" stroke="currentColor" strokeWidth="2"/></svg>

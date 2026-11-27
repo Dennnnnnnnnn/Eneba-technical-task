@@ -140,3 +140,21 @@
 @media(max-width:1050px){.genre-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:700px){.genre-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:480px){.genre-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Phase 6 card polish */
+.eneba-card{overflow:hidden}
+.eneba-card-copy{height:178px!important;transform:translateY(0)!important;transition:translate .45s cubic-bezier(.2,.7,.1,1)!important;background:#27105e}
+.eneba-card .eneba-card-actions{top:100%!important;height:98px!important;padding:8px 10px 10px!important;gap:6px!important;background:#27105e}
+.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -98px!important}
+.eneba-card .eneba-title{height:39px!important;line-height:1.27!important;margin:8px 10px 3px!important}
+.eneba-card .eneba-region{margin:0 10px 6px!important}
+.eneba-card .eneba-from{margin:0 10px!important;line-height:1.08}
+.eneba-card .eneba-price{margin:1px 10px 2px!important;line-height:1.04}
+.eneba-card .eneba-cashback{margin:0 10px 7px!important;font-size:11px!important;font-weight:800!important;display:flex;align-items:center;gap:5px;line-height:1.15}
+.eneba-card .eneba-platform{height:24px!important;margin-top:-24px!important;font-size:10px!important;gap:5px!important;padding:0 8px!important;display:flex;align-items:center;justify-content:center}
+.platform-logo{width:15px;height:15px;display:inline-block;flex:none;color:#fff}
+.platform-logo-image{object-fit:contain;filter:drop-shadow(0 0 0 rgba(0,0,0,0))}
+.cashback-badge{display:inline-flex!important;align-items:center!important;gap:6px!important;bottom:24px!important;padding:6px 10px!important;font-size:11px!important;font-weight:900!important;line-height:1}
+.cashback-badge svg,.cashback-inline-icon svg{width:14px;height:14px;display:block}
+.cashback-inline-icon{display:inline-flex;align-items:center;justify-content:center;color:#8ddfba}
+@media(max-width:620px){.eneba-card-copy{height:176px!important}.eneba-card .eneba-card-actions{height:94px!important}.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -94px!important}}
