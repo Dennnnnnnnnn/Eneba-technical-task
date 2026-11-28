@@ -158,3 +158,5 @@
 .cashback-badge svg,.cashback-inline-icon svg{width:14px;height:14px;display:block}
 .cashback-inline-icon{display:inline-flex;align-items:center;justify-content:center;color:#8ddfba}
 @media(max-width:620px){.eneba-card-copy{height:176px!important}.eneba-card .eneba-card-actions{height:94px!important}.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -94px!important}}
+/* Self-hosted platform marks render white against the translucent platform strip. */
+.eneba-platform .platform-logo-image{filter:brightness(0) invert(1);width:15px;height:15px;object-fit:contain}
