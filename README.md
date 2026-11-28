@@ -1,85 +1,95 @@
-# Eneba-inspired digital marketplace — internship project
+# Eneba-inspired digital marketplace
 
-**Educational demo, not affiliated with or endorsed by Eneba.** The app demonstrates a marketplace with seller offers and **simulated** digital-key checkout; no real payments or redeemable codes. It uses Eneba styling and a linked brand logo as design references.
+**Internship technical assignment · educational demo**
 
-## Stack
+A full-stack marketplace for digital games and gift cards, inspired by the look and feel of [Eneba](https://www.eneba.com/). Visitors can explore a catalog, search for games, compare offers from multiple sellers, and complete a **simulated** purchase that delivers a demo digital key.
 
-React 18 + TypeScript + Vite frontend, Go 1.23 + Gin REST backend, PostgreSQL 16 / Neon database, versioned SQL migrations. Deployed together as one Docker web service to keep authentication same-origin.
+> **Disclaimer:** This project is not affiliated with or endorsed by Eneba. No real payments are processed, and the delivered keys are fictional and cannot be redeemed. Eneba branding and externally hosted artwork are used as visual references; usage rights must be reviewed before reuse outside this demonstration.
 
-## Features
+## Links
+- **Live demo:** https://eneba-technical-task.onrender.com/
 
-- Backend-driven homepage banners, category shortcuts and independent product shelves.
-- Catalog with platform/region/price filters, sorting, pagination and PostgreSQL fuzzy search.
-- Product details and price comparison across sellers.
-- Email/password authentication using signed, HTTP-only session cookies.
-- Cart dropdown, cart page, **simulated** checkout with transactional key allocation and order history.
-- Recently viewed product IDs stored locally in the browser; full details retrieved from the API.
+> The live demo is deployed with Render. Its availability may vary due to hosting limits; verify the links before submitting.
 
-## Local development
+## Tech stack
 
-Requirements: Go 1.23+, Node.js 22+, Docker with Compose.
+| Layer | Technology |
+| --- | --- |
+| Frontend | React 18, TypeScript, Vite |
+| Backend | **Go 1.25**, Gin, REST API |
+| Database | PostgreSQL 16 locally; hosted PostgreSQL on Neon |
+| Authentication | Email/password, signed HttpOnly session cookies |
+| Hosting | Single Docker Web Service on Render |
+| Testing | Go tests, TypeScript production build, opt-in HTTP integration script |
 
-Terminal A (project root):
+Using one production origin lets Go serve both the React application and `/api/v1/*` endpoints, simplifying session-cookie handling.
 
-```sh
-docker compose up -d db
+## Implemented functionality
+
+- **Homepage:** Backend-provided banners, shortcuts, product shelves, and categories; each shelf loads from its own API endpoint.
+- **Store:** Product catalog with search, platform/region/price filters, sorting, and pagination.
+- **Search:** PostgreSQL-backed name search with partial and typo-tolerant matching.
+- **Product details:** Game information and offers from multiple sellers, region selection, and a purchase sidebar.
+- **Favorites:** Signed-in users can save products; counts are persisted in the database.
+- **Authentication:** Registration, login, logout, and routes protected by session authentication.
+- **Cart and checkout:** Add/remove seller offers, simulate a purchase, allocate demo keys transactionally, and review order history.
+- **Recently viewed:** Product identifiers are remembered in the browser; details are fetched from the API.
+
+Some UI elements (including PayPal styling, cashback promotions, and language/currency preferences) are **demonstrations**, not live integrations. Actual checkout remains simulated and denominated in EUR.
+
+## Architecture
+
+```text
+Browser (React + TypeScript)
+        |
+        | REST/JSON + session cookie
+        v
+Go API (Gin)
+  |-- catalog and search
+  |-- homepage content
+  |-- authentication and favorites
+  |-- cart, checkout and orders
+        |
+        v
+PostgreSQL (products, offers, users, keys, orders)
 ```
 
-Terminal B:
+In production the Go HTTP server also serves the compiled React assets from `/app/public`.
 
-```sh
-cd backend
-go mod download
-go run ./cmd/migrate
-go run ./cmd/api
-```
+## Run locally
 
-Terminal C:
+**Prerequisites:** Go **1.25**, Node.js **22+**, Docker and Docker Compose.
 
-```sh
-cd frontend
-npm install
-npm run dev
-```
+1. Start the database from the repository root:
 
-Visit http://localhost:5173. Vite proxies `/api` to Go on port 8080. For Go on another host set `VITE_API_URL` appropriately; **don't point it cross-domain in production** if using same-site cookies.
+   ```bash
+   docker compose up -d db
+   ```
 
-## Testing
+2. Configure backend environment variables. Set `DATABASE_URL` to your local PostgreSQL connection string and `SESSION_SECRET` to a long random value. For example, for the default development-only Compose credentials:
 
-```sh
-cd backend && go test ./...
-cd ../frontend && npm run build
-```
+   ```bash
+   export DATABASE_URL='postgres://marketplace:marketplace_dev_only@localhost:5432/marketplace?sslmode=disable'
+   export SESSION_SECRET='replace-with-a-long-random-secret'
+   export COOKIE_SECURE=false
+   ```
 
-More detailed testing instructions: [docs/TESTING.md](docs/TESTING.md).
+   These examples are for local development only. Never commit production credentials. On Windows, set the environment variables using your shell's syntax.
 
-## Deployment
+3. Run migrations and the API:
 
-One Docker image builds the frontend and backend and serves both at the same HTTPS domain. It needs a PostgreSQL `DATABASE_URL`, a private `SESSION_SECRET`, and secure cookies.
+   ```bash
+   cd backend
+   go mod download
+   go run ./cmd/migrate
+   go run ./cmd/api
+   ```
 
-Follow [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for Neon and Render. `render.yaml`, `Dockerfile`, `.dockerignore`, `docker/start.sh` and `.github/workflows/ci.yml` are included.
+4. In another terminal, start the React app:
 
-**Live URL:** _Add the actual deployed URL here after deployment._  
-**GitHub repository:** _Add the actual GitHub URL after creating the repository._
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
 
-## Important limitations
-
-- Checkout and keys are fictional/demo-only; no real payment provider.
-- The design uses an official Eneba-hosted logo and third-party game art; review asset rights before broader reuse.
-- Homepage banners, cashback and stock are sample data.
-- Free-tier sleeping/quotas and third-party image availability can affect the demo.
-- This is an internship exercise, not a production-ready commerce platform.
-
-## Intern evaluation deliverables
-
-- GitHub repository link: **not created yet**.
-- Public deployed link: **not deployed yet**.
-- **Full AI chat transcript or share link**: must be provided separately; summary file alone is insufficient. See [docs/AI_LOG_GUIDE.md](docs/AI_LOG_GUIDE.md).
-
-See `docs/architecture.md` for module overview and technical decisions.
-
-## Phase 6: reliability checks
-
-Run `cd backend && go test ./...` for Go security and API unit tests. Run `cd frontend && npm install && npm run build` for TypeScript and the React production bundle.
-
-A separate, **opt-in** HTTP integration test covers two-account demo checkout, digital-key uniqueness, checkout idempotency, and order isolation. Follow [docs/PHASE6_TESTING.md](docs/PHASE6_TESTING.md) before running it; the test creates users and consumes demo inventory, so use an isolated local test database.
