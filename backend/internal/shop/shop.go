@@ -54,6 +54,8 @@ func (s *Shop) session(userID int64) string {
 	mac.Write([]byte(part))
 	return part + "." + base64.RawURLEncoding.EncodeToString(mac.Sum(nil))
 }
+
+// Verify the signed session before treating a request as authenticated.
 func (s *Shop) readSession(token string) (int64, bool) {
 	pieces := strings.Split(token, ".")
 	if len(pieces) != 2 {
@@ -216,6 +218,7 @@ func (s *Shop) Cart(c *gin.Context) {
 }
 
 // withCartLock serializes cart mutations and checkout for the same account.
+// Serialize cart mutations for one buyer inside a database transaction.
 func (s *Shop) withCartLock(ctx context.Context, user int64, fn func(pgx.Tx) error) error {
 	tx, err := s.DB.Begin(ctx)
 	if err != nil {
@@ -371,6 +374,8 @@ func (s *Shop) Order(c *gin.Context) {
 // Checkout is a SIMULATED payment. Each selected offer consumes precisely one unique key.
 // A per-user advisory transaction lock serializes this user's cart changes through checkout;
 // row locks on keys ensure different customers cannot consume the same key.
+// Checkout performs an atomic simulated purchase; the idempotency key and
+// row locks prevent duplicate orders or distributing one key twice.
 func (s *Shop) Checkout(c *gin.Context) {
 	user, _ := s.User(c)
 	var req struct {

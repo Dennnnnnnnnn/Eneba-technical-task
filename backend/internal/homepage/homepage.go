@@ -31,6 +31,9 @@ type Page struct {
 	Categories []Category `json:"categories"`
 	Sections   []Section  `json:"sections"`
 }
+
+// Repository loads homepage content from the database, rather than requiring
+// React to hardcode product lists or promotional blocks.
 type Repository struct{ pool *pgxpool.Pool }
 
 func NewRepository(pool *pgxpool.Pool) *Repository { return &Repository{pool: pool} }

@@ -10,6 +10,8 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+// Product is the catalog record sent to React; seller-specific prices are
+// represented separately as offers. Money is stored in integer cents.
 type Product struct {
 	ID              int64  `json:"id"`
 	Slug            string `json:"slug"`
@@ -55,6 +57,7 @@ type Page struct {
 
 var ErrNotFound = errors.New("product not found")
 
+// Repository reads catalog and offer data from PostgreSQL.
 type Repository struct{ pool *pgxpool.Pool }
 
 func NewRepository(pool *pgxpool.Pool) *Repository { return &Repository{pool: pool} }

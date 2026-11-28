@@ -57,6 +57,8 @@ func allowedMutationOrigin(origin string, request *http.Request, corsOrigin stri
 		strings.EqualFold(parsed.Host, request.Host) && parsed.User == nil && parsed.Path == "" && parsed.RawQuery == ""
 }
 
+// NewRouter registers public catalog endpoints, protected shop routes, and
+// homepage content endpoints on one HTTP server.
 func NewRouter(pool *pgxpool.Pool, repo Catalog, corsOrigin string) *gin.Engine {
 	router := gin.New()
 	router.Use(gin.Logger(), gin.Recovery())
@@ -101,6 +103,7 @@ func NewRouter(pool *pgxpool.Pool, repo Catalog, corsOrigin string) *gin.Engine 
 	v1.POST("/auth/login", store.Login)
 	v1.POST("/auth/logout", store.Logout)
 	v1.GET("/auth/me", store.Me)
+	// Cart, checkout, and orders always require a valid authenticated session.
 	protected := v1.Group("")
 	protected.Use(store.Require)
 	protected.GET("/cart", store.Cart)

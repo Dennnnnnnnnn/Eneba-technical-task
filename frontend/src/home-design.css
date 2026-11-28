@@ -1,186 +1,1677 @@
+
 /* Backend-fed Eneba-inspired homepage, scoped to avoid altering Phase 3 checkout. */
-:root{--en-purple:#4618ac;--en-dark:#2c0b73;--en-panel:#351080;--en-mint:#a7ebcc;--en-yellow:#ffcf31}
-.site-header{background:var(--en-purple)}.topbar{min-height:74px;gap:17px}.search-wrap{background:transparent;border:1px solid #e0d0ff;border-radius:2px;max-width:none;flex:1;height:46px}.search-wrap input::placeholder{color:#e4d7fb}.locale{background:transparent;border:0;color:#fff;font-weight:600;font-size:12px;white-space:nowrap}.locale:hover,.heart-header:hover,.cart-icon:hover,.nav-links button:not(.special-link):hover{color:var(--en-yellow)}.cart-count{background:#e9364c;color:#fff;width:19px;height:19px}.heart-header{font-size:30px}.avatar-button{width:34px;height:34px;border-radius:50%;border:1px solid #fff;background:#6d4bc1;color:#fff;font-size:21px}.avatar-button:hover{background:#3a177a}.user-menu{display:flex;align-items:center;gap:5px}.logout-compact{color:white;background:none;border:0;font-size:11px}.nav-band{background:#2e0b73}.nav-links{min-height:43px;gap:25px}.nav-links button{transition:color .15s}.nav-links .special-link{background:#54112a;border:1px solid #e34b62;color:#fff;border-radius:3px;padding:8px 12px}.nav-links .special-link:hover{background:#341075;color:#fff}.gta-mini{color:#f4b9df;font-weight:900;font-size:9px;vertical-align:super}
-.eneba-home{background:#4618ac}.promo-grid{padding-top:18px;padding-bottom:16px;display:grid;grid-template-columns:minmax(0,3fr) repeat(3,minmax(0,1fr));gap:9px}.promo-tile{height:315px;position:relative;overflow:hidden;background-color:#25095e;background-size:cover;background-position:center;display:flex;align-items:end;isolation:isolate}.promo-tile:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#200743df,transparent 78%);z-index:-1}.promo-main{background-color:#29105f;background-position:65%}.promo-rose{background:linear-gradient(145deg,#830b4d,#290d6a 70%)}.promo-blue{background:linear-gradient(140deg,#184aa3,#4d138b)}.promo-orange{background:linear-gradient(140deg,#b64a10,#481075)}.promo-content{padding:18px;width:100%;min-width:0}.promo-content>span{color:#ffe345;font-size:10px;font-weight:900;letter-spacing:1.5px}.promo-content h1{font-size:clamp(17px,2vw,30px);line-height:1.1;margin:9px 0 12px;font-weight:900;text-shadow:0 2px 8px #0009;overflow-wrap:break-word}.promo-main .promo-content{padding:32px;max-width:470px}.promo-main h1{font-size:clamp(34px,4vw,58px)}.promo-content p{font-size:13px;line-height:1.5;color:#efe3ff;max-width:310px}.promo-content .yellow-button{font-size:11px;min-width:0;padding:11px 13px;margin-top:6px}.promo-small .yellow-button{font-size:9px;padding:9px 8px;width:100%}
-.shortcuts{display:flex;align-items:center;gap:4px;padding-top:22px;padding-bottom:26px}.shortcut-track{overflow-x:auto;scrollbar-width:none;display:flex;gap:7px;flex:1;scroll-behavior:smooth}.shortcut-track::-webkit-scrollbar,.eneba-track::-webkit-scrollbar{display:none}.shortcut{min-width:95px;display:grid;justify-items:center;gap:8px;background:none;border:0;color:#fff;font-size:11px;font-weight:700;padding:6px 3px}.shortcut:hover{color:var(--en-yellow)}.shortcut-symbol{display:grid;place-items:center;width:45px;height:45px;border:1px solid #8e72d2;border-radius:12px;font-size:26px;color:#f6e8ff;background:#5e31ae}.shortcut-arrow{border:0;background:transparent;color:#e6d6ff;font-size:27px;width:24px;padding:0}.shortcut-arrow:hover{color:var(--en-yellow)}
-.home-shelf{padding:34px 0 32px;background:#4618ac}.home-shelf:nth-of-type(even){background:#371082}.home-shelf-heading{font-size:26px;margin:0;font-weight:800;letter-spacing:-.4px}.home-shelf-heading span{font-size:14px;color:#d6c9ed;vertical-align:middle;font-weight:400}.home-shelf-subtitle{font-size:12px;color:#d9c8f5;margin:6px 0 18px}.shelf-loading{min-height:280px}.shelf-scroll-area{position:relative}.eneba-track{display:flex;overflow-x:auto;scroll-behavior:smooth;scroll-snap-type:x proximity;gap:14px;padding:0 0 15px;scrollbar-width:none}.track-arrow{position:absolute;top:34%;z-index:3;width:33px;height:41px;border:1px solid #d5c3f6;background:#32116edb;color:white;font-size:27px;opacity:0;transition:opacity .2s,background .2s}.shelf-scroll-area:hover .track-arrow,.track-arrow:focus-visible{opacity:1}.track-arrow:hover{background:#1a064f}.track-prev{left:-12px}.track-next{right:-12px}.eneba-progress{height:3px;background:#8469c1;margin:7px 0 23px;position:relative}.eneba-progress span{position:absolute;top:0;bottom:0;width:20%;background:#fff;transition:left .15s}.outlined-button{border:1px solid white;background:none;color:white;padding:10px 29px;min-width:135px;font-weight:700;font-size:12px}.outlined-button:hover{background:#2b0a74;border-color:var(--en-yellow)}.outlined-button.centered{display:block;margin:0 auto}
-.eneba-card{position:relative;flex:0 0 clamp(155px,16.2vw,205px);min-width:0;border:1px solid #88cdb7;background:#27105e;scroll-snap-align:start;display:flex;flex-direction:column;transition:box-shadow .2s}.eneba-card:hover{box-shadow:0 7px 25px #1607389c}.eneba-art{height:252px;overflow:hidden;position:relative}.eneba-art img{width:100%;height:100%;object-fit:cover;display:block}.eneba-fallback{display:grid;place-items:center;padding:12px;text-align:center;font-size:20px;font-weight:900;height:100%;background:linear-gradient(120deg,#18083e90,#9c46a444)}.eneba-wish{position:absolute;z-index:2;top:8px;right:8px;background:#2b0f63c9;color:#fff;border:1px solid white;width:33px;height:33px;font-size:24px;line-height:1;opacity:0;transition:opacity .15s}.eneba-card:hover .eneba-wish,.eneba-wish:focus-visible{opacity:1}.eneba-wish:hover{color:var(--en-yellow)}.cashback-badge{position:absolute;bottom:0;left:0;background:#9beccb;color:#153b33;font-size:10px;font-weight:900;padding:4px 7px}.eneba-card-actions{position:absolute;z-index:1;bottom:0;left:0;right:0;height:40%;display:flex;flex-direction:column;justify-content:center;gap:9px;padding:15px;background:#2c0d76;transform:translateY(101%);transition:transform .5s ease}.eneba-card:hover .eneba-card-actions,.eneba-card:focus-within .eneba-card-actions{transform:translateY(0)}.eneba-card-actions button{padding:10px 4px;font-weight:800;font-size:12px}.card-add{background:var(--en-yellow);border:1px solid var(--en-yellow);color:#201047}.card-offers{background:transparent;color:white;border:1px solid white}.eneba-platform{background:#241050;color:#e8dcff;text-align:center;font-size:10px;text-transform:uppercase;padding:6px 4px}.eneba-title{background:none;border:0;color:white;font-weight:800;font-size:12px;text-align:left;line-height:1.35;height:48px;margin:10px 10px 4px;padding:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.eneba-title:hover{text-decoration:underline}.eneba-region{font-size:10px;font-weight:800;margin:0 10px 12px}.region-green{color:#92eacb}.region-pink{color:#ff9da9}.eneba-from{font-size:11px;color:#d5cce1;margin:0 10px}.eneba-price{font-size:23px;font-weight:900;margin:3px 10px 8px}.eneba-price span{font-size:12px;color:#beb4d5;vertical-align:middle}.eneba-cashback{color:#a5eace;font-size:10px;margin:auto 10px 12px;font-weight:700}
-.genre-section{padding:40px 0 65px;background:#2d0d71}.genre-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:25px 0}.genre-card{display:flex;flex-direction:column;text-align:left;min-height:167px;padding:16px;background:#4b209f;border:1px solid #6f47b7;box-shadow:0 6px 15px #1a073b70;color:#fff;transition:background .2s}.genre-card:hover{background:#2d0d71}.genre-count{font-size:11px;color:#e4d6ff}.genre-glyph{font-size:50px;flex:1;text-align:center;align-self:center;display:grid;place-items:center}.genre-card strong{font-size:17px}
-.payment-strip{background:#fff;color:#34255f;padding:18px 0}.payment-logos{display:flex;gap:28px;justify-content:center;flex-wrap:wrap;align-items:center;font-size:13px}.payment-logos b{font-size:17px}.eneba-footer{padding:48px 0 22px;background:#230a56}.footer-columns{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:20px}.footer-column{display:flex;flex-direction:column;gap:13px}.footer-column strong{font-size:15px}.footer-column span{font-size:12px;color:#cbb7ed}.footer-social{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;border-bottom:1px solid #614094;padding:32px 0 20px}.footer-social p{font-size:15px}.footer-social p span{font-size:10px}.footer-newsletter{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;padding:27px 0}.footer-newsletter strong{font-size:20px}.footer-newsletter form{display:flex;gap:8px}.footer-newsletter input{min-width:240px;padding:12px;border:1px solid #a78fd8;background:#3e177d;color:white}.footer-newsletter .yellow-button{min-width:0}.footer-legal{font-size:10px;color:#b4a1d9;border-top:1px solid #5d398e;padding-top:16px}
-@media(max-width:1050px){.promo-grid{grid-template-columns:3fr repeat(3,1fr)}.promo-tile{height:270px}.promo-main h1{font-size:35px}.promo-small h1{font-size:16px}.eneba-art{height:220px}.topbar{gap:10px}}
-@media(max-width:780px){.promo-grid{grid-template-columns:repeat(3,1fr)}.promo-main{grid-column:1/-1}.promo-tile{height:155px}.promo-main{height:270px}.promo-small .promo-content{padding:10px}.promo-small h1{font-size:15px}.footer-columns{grid-template-columns:repeat(3,1fr)}.genre-grid{grid-template-columns:repeat(2,1fr)}.eneba-art{height:225px}.eneba-card{flex-basis:175px}}
-@media(max-width:540px){.promo-grid{gap:5px;padding-top:10px}.promo-main{height:235px}.promo-main .promo-content{padding:19px}.promo-main h1{font-size:34px}.promo-small{height:170px}.promo-small h1{font-size:12px}.promo-small .yellow-button{font-size:8px}.topbar .locale{display:none}.topbar .search-wrap{order:5}.home-shelf{padding:25px 0}.home-shelf-heading{font-size:21px}.eneba-card{flex-basis:155px}.eneba-art{height:203px}.footer-columns{grid-template-columns:repeat(2,1fr)}.footer-social{grid-template-columns:1fr}.footer-newsletter input{min-width:0;width:100%}.footer-newsletter form{width:100%}.footer-newsletter .yellow-button{padding:10px}.payment-logos{gap:15px;font-size:11px}}
-@media(hover:none){.track-arrow{opacity:1}.eneba-wish{opacity:1}.eneba-card-actions{transform:none;position:static;height:auto;padding:8px;background:#321476}.eneba-card-actions button{padding:7px}.cashback-badge{bottom:0}}
-@media(prefers-reduced-motion:reduce){.eneba-card-actions,.eneba-progress span,.track-arrow{transition:none}.eneba-track,.shortcut-track{scroll-behavior:auto}}
-
+:root {
+  --en-purple: #4618ac;
+  --en-dark: #2c0b73;
+  --en-panel: #351080;
+  --en-mint: #a7ebcc;
+  --en-yellow: #ffcf31;
+}
+.site-header {
+  background: var(--en-purple);
+}
+.topbar {
+  min-height: 74px;
+  gap: 17px;
+}
+.search-wrap {
+  background: transparent;
+  border: 1px solid #e0d0ff;
+  border-radius: 2px;
+  max-width: none;
+  flex: 1;
+  height: 46px;
+}
+.search-wrap input::placeholder {
+  color: #e4d7fb;
+}
+.locale {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.locale:hover,.heart-header:hover,.cart-icon:hover,.nav-links button:not(.special-link):hover {
+  color: var(--en-yellow);
+}
+.cart-count {
+  background: #e9364c;
+  color: #fff;
+  width: 19px;
+  height: 19px;
+}
+.heart-header {
+  font-size: 30px;
+}
+.avatar-button {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  background: #6d4bc1;
+  color: #fff;
+  font-size: 21px;
+}
+.avatar-button:hover {
+  background: #3a177a;
+}
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.logout-compact {
+  color: white;
+  background: none;
+  border: 0;
+  font-size: 11px;
+}
+.nav-band {
+  background: #2e0b73;
+}
+.nav-links {
+  min-height: 43px;
+  gap: 25px;
+}
+.nav-links button {
+  transition: color .15s;
+}
+.nav-links .special-link {
+  background: #54112a;
+  border: 1px solid #e34b62;
+  color: #fff;
+  border-radius: 3px;
+  padding: 8px 12px;
+}
+.nav-links .special-link:hover {
+  background: #341075;
+  color: #fff;
+}
+.gta-mini {
+  color: #f4b9df;
+  font-weight: 900;
+  font-size: 9px;
+  vertical-align: super;
+}
+.eneba-home {
+  background: #4618ac;
+}
+.promo-grid {
+  padding-top: 18px;
+  padding-bottom: 16px;
+  display: grid;
+  grid-template-columns: minmax(0,3fr) repeat(3,minmax(0,1fr));
+  gap: 9px;
+}
+.promo-tile {
+  height: 315px;
+  position: relative;
+  overflow: hidden;
+  background-color: #25095e;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: end;
+  isolation: isolate;
+}
+.promo-tile:before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg,#200743df,transparent 78%);
+  z-index: -1;
+}
+.promo-main {
+  background-color: #29105f;
+  background-position: 65%;
+}
+.promo-rose {
+  background: linear-gradient(145deg,#830b4d,#290d6a 70%);
+}
+.promo-blue {
+  background: linear-gradient(140deg,#184aa3,#4d138b);
+}
+.promo-orange {
+  background: linear-gradient(140deg,#b64a10,#481075);
+}
+.promo-content {
+  padding: 18px;
+  width: 100%;
+  min-width: 0;
+}
+.promo-content>span {
+  color: #ffe345;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+.promo-content h1 {
+  font-size: clamp(17px,2vw,30px);
+  line-height: 1.1;
+  margin: 9px 0 12px;
+  font-weight: 900;
+  text-shadow: 0 2px 8px #0009;
+  overflow-wrap: break-word;
+}
+.promo-main .promo-content {
+  padding: 32px;
+  max-width: 470px;
+}
+.promo-main h1 {
+  font-size: clamp(34px,4vw,58px);
+}
+.promo-content p {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #efe3ff;
+  max-width: 310px;
+}
+.promo-content .yellow-button {
+  font-size: 11px;
+  min-width: 0;
+  padding: 11px 13px;
+  margin-top: 6px;
+}
+.promo-small .yellow-button {
+  font-size: 9px;
+  padding: 9px 8px;
+  width: 100%;
+}
+.shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding-top: 22px;
+  padding-bottom: 26px;
+}
+.shortcut-track {
+  overflow-x: auto;
+  scrollbar-width: none;
+  display: flex;
+  gap: 7px;
+  flex: 1;
+  scroll-behavior: smooth;
+}
+.shortcut-track::-webkit-scrollbar,.eneba-track::-webkit-scrollbar {
+  display: none;
+}
+.shortcut {
+  min-width: 95px;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  background: none;
+  border: 0;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 3px;
+}
+.shortcut:hover {
+  color: var(--en-yellow);
+}
+.shortcut-symbol {
+  display: grid;
+  place-items: center;
+  width: 45px;
+  height: 45px;
+  border: 1px solid #8e72d2;
+  border-radius: 12px;
+  font-size: 26px;
+  color: #f6e8ff;
+  background: #5e31ae;
+}
+.shortcut-arrow {
+  border: 0;
+  background: transparent;
+  color: #e6d6ff;
+  font-size: 27px;
+  width: 24px;
+  padding: 0;
+}
+.shortcut-arrow:hover {
+  color: var(--en-yellow);
+}
+.home-shelf {
+  padding: 34px 0 32px;
+  background: #4618ac;
+}
+.home-shelf:nth-of-type(even) {
+  background: #371082;
+}
+.home-shelf-heading {
+  font-size: 26px;
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: -.4px;
+}
+.home-shelf-heading span {
+  font-size: 14px;
+  color: #d6c9ed;
+  vertical-align: middle;
+  font-weight: 400;
+}
+.home-shelf-subtitle {
+  font-size: 12px;
+  color: #d9c8f5;
+  margin: 6px 0 18px;
+}
+.shelf-loading {
+  min-height: 280px;
+}
+.shelf-scroll-area {
+  position: relative;
+}
+.eneba-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x proximity;
+  gap: 14px;
+  padding: 0 0 15px;
+  scrollbar-width: none;
+}
+.track-arrow {
+  position: absolute;
+  top: 34%;
+  z-index: 3;
+  width: 33px;
+  height: 41px;
+  border: 1px solid #d5c3f6;
+  background: #32116edb;
+  color: white;
+  font-size: 27px;
+  opacity: 0;
+  transition: opacity .2s,background .2s;
+}
+.shelf-scroll-area:hover .track-arrow,.track-arrow:focus-visible {
+  opacity: 1;
+}
+.track-arrow:hover {
+  background: #1a064f;
+}
+.track-prev {
+  left: -12px;
+}
+.track-next {
+  right: -12px;
+}
+.eneba-progress {
+  height: 3px;
+  background: #8469c1;
+  margin: 7px 0 23px;
+  position: relative;
+}
+.eneba-progress span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 20%;
+  background: #fff;
+  transition: left .15s;
+}
+.outlined-button {
+  border: 1px solid white;
+  background: none;
+  color: white;
+  padding: 10px 29px;
+  min-width: 135px;
+  font-weight: 700;
+  font-size: 12px;
+}
+.outlined-button:hover {
+  background: #2b0a74;
+  border-color: var(--en-yellow);
+}
+.outlined-button.centered {
+  display: block;
+  margin: 0 auto;
+}
+.eneba-card {
+  position: relative;
+  flex: 0 0 clamp(155px,16.2vw,205px);
+  min-width: 0;
+  border: 1px solid #88cdb7;
+  background: #27105e;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow .2s;
+}
+.eneba-card:hover {
+  box-shadow: 0 7px 25px #1607389c;
+}
+.eneba-art {
+  height: 252px;
+  overflow: hidden;
+  position: relative;
+}
+.eneba-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.eneba-fallback {
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 900;
+  height: 100%;
+  background: linear-gradient(120deg,#18083e90,#9c46a444);
+}
+.eneba-wish {
+  position: absolute;
+  z-index: 2;
+  top: 8px;
+  right: 8px;
+  background: #2b0f63c9;
+  color: #fff;
+  border: 1px solid white;
+  width: 33px;
+  height: 33px;
+  font-size: 24px;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity .15s;
+}
+.eneba-card:hover .eneba-wish,.eneba-wish:focus-visible {
+  opacity: 1;
+}
+.eneba-wish:hover {
+  color: var(--en-yellow);
+}
+.cashback-badge {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: #9beccb;
+  color: #153b33;
+  font-size: 10px;
+  font-weight: 900;
+  padding: 4px 7px;
+}
+.eneba-card-actions {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 9px;
+  padding: 15px;
+  background: #2c0d76;
+  transform: translateY(101%);
+  transition: transform .5s ease;
+}
+.eneba-card:hover .eneba-card-actions,.eneba-card:focus-within .eneba-card-actions {
+  transform: translateY(0);
+}
+.eneba-card-actions button {
+  padding: 10px 4px;
+  font-weight: 800;
+  font-size: 12px;
+}
+.card-add {
+  background: var(--en-yellow);
+  border: 1px solid var(--en-yellow);
+  color: #201047;
+}
+.card-offers {
+  background: transparent;
+  color: white;
+  border: 1px solid white;
+}
+.eneba-platform {
+  background: #241050;
+  color: #e8dcff;
+  text-align: center;
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 6px 4px;
+}
+.eneba-title {
+  background: none;
+  border: 0;
+  color: white;
+  font-weight: 800;
+  font-size: 12px;
+  text-align: left;
+  line-height: 1.35;
+  height: 48px;
+  margin: 10px 10px 4px;
+  padding: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+.eneba-title:hover {
+  text-decoration: underline;
+}
+.eneba-region {
+  font-size: 10px;
+  font-weight: 800;
+  margin: 0 10px 12px;
+}
+.region-green {
+  color: #92eacb;
+}
+.region-pink {
+  color: #ff9da9;
+}
+.eneba-from {
+  font-size: 11px;
+  color: #d5cce1;
+  margin: 0 10px;
+}
+.eneba-price {
+  font-size: 23px;
+  font-weight: 900;
+  margin: 3px 10px 8px;
+}
+.eneba-price span {
+  font-size: 12px;
+  color: #beb4d5;
+  vertical-align: middle;
+}
+.eneba-cashback {
+  color: #a5eace;
+  font-size: 10px;
+  margin: auto 10px 12px;
+  font-weight: 700;
+}
+.genre-section {
+  padding: 40px 0 65px;
+  background: #2d0d71;
+}
+.genre-grid {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 13px;
+  margin: 25px 0;
+}
+.genre-card {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  min-height: 167px;
+  padding: 16px;
+  background: #4b209f;
+  border: 1px solid #6f47b7;
+  box-shadow: 0 6px 15px #1a073b70;
+  color: #fff;
+  transition: background .2s;
+}
+.genre-card:hover {
+  background: #2d0d71;
+}
+.genre-count {
+  font-size: 11px;
+  color: #e4d6ff;
+}
+.genre-glyph {
+  font-size: 50px;
+  flex: 1;
+  text-align: center;
+  align-self: center;
+  display: grid;
+  place-items: center;
+}
+.genre-card strong {
+  font-size: 17px;
+}
+.payment-strip {
+  background: #fff;
+  color: #34255f;
+  padding: 18px 0;
+}
+.payment-logos {
+  display: flex;
+  gap: 28px;
+  justify-content: center;
+  flex-wrap: wrap;
+  align-items: center;
+  font-size: 13px;
+}
+.payment-logos b {
+  font-size: 17px;
+}
+.eneba-footer {
+  padding: 48px 0 22px;
+  background: #230a56;
+}
+.footer-columns {
+  display: grid;
+  grid-template-columns: repeat(5,minmax(0,1fr));
+  gap: 20px;
+}
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+.footer-column strong {
+  font-size: 15px;
+}
+.footer-column span {
+  font-size: 12px;
+  color: #cbb7ed;
+}
+.footer-social {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 20px;
+  border-bottom: 1px solid #614094;
+  padding: 32px 0 20px;
+}
+.footer-social p {
+  font-size: 15px;
+}
+.footer-social p span {
+  font-size: 10px;
+}
+.footer-newsletter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 27px 0;
+}
+.footer-newsletter strong {
+  font-size: 20px;
+}
+.footer-newsletter form {
+  display: flex;
+  gap: 8px;
+}
+.footer-newsletter input {
+  min-width: 240px;
+  padding: 12px;
+  border: 1px solid #a78fd8;
+  background: #3e177d;
+  color: white;
+}
+.footer-newsletter .yellow-button {
+  min-width: 0;
+}
+.footer-legal {
+  font-size: 10px;
+  color: #b4a1d9;
+  border-top: 1px solid #5d398e;
+  padding-top: 16px;
+}
+@media(max-width:1050px) {
+  .promo-grid {
+    grid-template-columns: 3fr repeat(3,1fr);
+  }
+  .promo-tile {
+    height: 270px;
+  }
+  .promo-main h1 {
+    font-size: 35px;
+  }
+  .promo-small h1 {
+    font-size: 16px;
+  }
+  .eneba-art {
+    height: 220px;
+  }
+  .topbar {
+    gap: 10px;
+  }
+}
+@media(max-width:780px) {
+  .promo-grid {
+    grid-template-columns: repeat(3,1fr);
+  }
+  .promo-main {
+    grid-column: 1/-1;
+  }
+  .promo-tile {
+    height: 155px;
+  }
+  .promo-main {
+    height: 270px;
+  }
+  .promo-small .promo-content {
+    padding: 10px;
+  }
+  .promo-small h1 {
+    font-size: 15px;
+  }
+  .footer-columns {
+    grid-template-columns: repeat(3,1fr);
+  }
+  .genre-grid {
+    grid-template-columns: repeat(2,1fr);
+  }
+  .eneba-art {
+    height: 225px;
+  }
+  .eneba-card {
+    flex-basis: 175px;
+  }
+}
+@media(max-width:540px) {
+  .promo-grid {
+    gap: 5px;
+    padding-top: 10px;
+  }
+  .promo-main {
+    height: 235px;
+  }
+  .promo-main .promo-content {
+    padding: 19px;
+  }
+  .promo-main h1 {
+    font-size: 34px;
+  }
+  .promo-small {
+    height: 170px;
+  }
+  .promo-small h1 {
+    font-size: 12px;
+  }
+  .promo-small .yellow-button {
+    font-size: 8px;
+  }
+  .topbar .locale {
+    display: none;
+  }
+  .topbar .search-wrap {
+    order: 5;
+  }
+  .home-shelf {
+    padding: 25px 0;
+  }
+  .home-shelf-heading {
+    font-size: 21px;
+  }
+  .eneba-card {
+    flex-basis: 155px;
+  }
+  .eneba-art {
+    height: 203px;
+  }
+  .footer-columns {
+    grid-template-columns: repeat(2,1fr);
+  }
+  .footer-social {
+    grid-template-columns: 1fr;
+  }
+  .footer-newsletter input {
+    min-width: 0;
+    width: 100%;
+  }
+  .footer-newsletter form {
+    width: 100%;
+  }
+  .footer-newsletter .yellow-button {
+    padding: 10px;
+  }
+  .payment-logos {
+    gap: 15px;
+    font-size: 11px;
+  }
+}
+@media(hover:none) {
+  .track-arrow {
+    opacity: 1;
+  }
+  .eneba-wish {
+    opacity: 1;
+  }
+  .eneba-card-actions {
+    transform: none;
+    position: static;
+    height: auto;
+    padding: 8px;
+    background: #321476;
+  }
+  .eneba-card-actions button {
+    padding: 7px;
+  }
+  .cashback-badge {
+    bottom: 0;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .eneba-card-actions,.eneba-progress span,.track-arrow {
+    transition: none;
+  }
+  .eneba-track,.shortcut-track {
+    scroll-behavior: auto;
+  }
+}
 /* Screenshot-following refinement: full-bleed banner with a 70/10/10/10 split. */
-.promo-grid{width:100%;max-width:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,7fr) repeat(3,minmax(0,1fr));gap:0;overflow:hidden}
-.promo-tile{height:335px;border-radius:0;min-width:0}
-.promo-main{background-position:center}
-.promo-main .promo-content{margin-left:clamp(16px,4vw,100px)}
-.promo-small .promo-content{padding:12px 8px}
-.promo-small h1{font-size:clamp(11px,1.35vw,21px)}
-.promo-small .yellow-button{font-size:10px}
-
+.promo-grid {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0,7fr) repeat(3,minmax(0,1fr));
+  gap: 0;
+  overflow: hidden;
+}
+.promo-tile {
+  height: 335px;
+  border-radius: 0;
+  min-width: 0;
+}
+.promo-main {
+  background-position: center;
+}
+.promo-main .promo-content {
+  margin-left: clamp(16px,4vw,100px);
+}
+.promo-small .promo-content {
+  padding: 12px 8px;
+}
+.promo-small h1 {
+  font-size: clamp(11px,1.35vw,21px);
+}
+.promo-small .yellow-button {
+  font-size: 10px;
+}
 /* Product text rises over artwork on hover; the controls appear BELOW the price/cashback. */
-.eneba-card{overflow:hidden;isolation:isolate}
-.eneba-art{height:254px;flex:0 0 254px}
-.eneba-platform{position:absolute;bottom:0;left:0;right:0;background:rgba(10,10,22,.57);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);color:#fff;z-index:1}
-.cashback-badge{bottom:26px;padding:7px 11px;font-size:11px;z-index:2;background:#9df2d2}
-.eneba-card-copy{position:relative;z-index:2;flex:0 0 194px;height:194px;background:#27105e;display:flex;flex-direction:column;transition:transform .5s cubic-bezier(.2,.7,.1,1)}
-.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{transform:translateY(-96px)}
-.eneba-card .eneba-title{flex:none;height:45px;margin:10px 11px 4px;font-size:12px}
-.eneba-card .eneba-region{margin:0 11px 8px;flex:none}
-.eneba-card .eneba-from{margin:0 11px}
-.eneba-card .eneba-price{margin:1px 11px 6px}
-.eneba-card .eneba-cashback{margin:auto 11px 10px;font-size:11px;font-weight:800;color:#a3efc8}
-.eneba-card .eneba-card-actions{position:absolute;top:100%;bottom:auto;left:0;right:0;height:96px;padding:8px 11px 10px;display:flex;flex-direction:column;justify-content:center;gap:6px;background:#27105e;transform:none;transition:none}
-.eneba-card .eneba-card-actions button{padding:8px 6px}
-.eneba-card:hover .eneba-card-actions,.eneba-card:focus-within .eneba-card-actions{transform:none}
-.eneba-card .eneba-wish{z-index:5}
-.eneba-track{overscroll-behavior-x:contain;scrollbar-width:none;scroll-snap-type:x proximity}
-.eneba-progress{height:4px;background:#7859bd;margin:12px 0 24px}
-.eneba-progress span{min-width:12px}
-.shelf-scroll-area:hover .track-arrow{opacity:1}
-.track-arrow{width:38px;height:47px;background:rgba(237,231,251,.82);color:#23115d;border:none;top:40%;font-weight:500;box-shadow:0 2px 8px #16063d50}
-.track-arrow:hover{background:#fff;color:#1c0a53}
-.track-prev{left:0}.track-next{right:0}
-.egift-tile{flex:0 0 clamp(200px,24vw,292px);height:clamp(285px,31vw,392px);border:1px solid #8874c2;overflow:hidden;padding:0;scroll-snap-align:start;display:grid;place-items:center;color:#fff;transition:border-color .2s,filter .2s}
-.egift-tile img{width:100%;height:100%;object-fit:cover;display:block}
-.egift-tile:hover{border-color:#f9d646;filter:brightness(1.08)}
-.egift-tile strong{font-size:22px}
-.genre-card{border:0;box-shadow:0 6px 16px #12062985;min-height:175px;padding:17px 18px}
-.genre-count{font-size:14px;color:#fff}
-.genre-glyph img{width:48px;height:48px;display:block}
-.genre-card:hover{background:#2d0d71;box-shadow:0 6px 16px #12062985}
-@media(max-width:900px){.promo-tile{height:260px}.promo-main h1{font-size:34px}.promo-small .yellow-button{font-size:8px;padding:8px 3px}}
-@media(max-width:620px){.promo-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.promo-main{grid-column:1/-1;height:238px}.promo-small{height:145px}.promo-small h1{font-size:12px}.promo-main .promo-content{margin-left:0}.eneba-card{flex-basis:176px}.eneba-art{height:224px;flex-basis:224px}.egift-tile{flex-basis:205px;height:285px}}
-@media(hover:none){.eneba-card-copy{transform:none!important;flex-basis:auto;height:auto;padding-bottom:90px}.eneba-card .eneba-card-actions{top:auto;bottom:0;height:90px}.eneba-card{overflow:visible}.eneba-wish{opacity:1}}
-@media(prefers-reduced-motion:reduce){.eneba-card-copy{transition:none}}
-.header-cart-svg{display:block}.cart-icon:hover .header-cart-svg{stroke:#ffcf31}
-
+.eneba-card {
+  overflow: hidden;
+  isolation: isolate;
+}
+.eneba-art {
+  height: 254px;
+  flex: 0 0 254px;
+}
+.eneba-platform {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10,10,22,.57);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  color: #fff;
+  z-index: 1;
+}
+.cashback-badge {
+  bottom: 26px;
+  padding: 7px 11px;
+  font-size: 11px;
+  z-index: 2;
+  background: #9df2d2;
+}
+.eneba-card-copy {
+  position: relative;
+  z-index: 2;
+  flex: 0 0 194px;
+  height: 194px;
+  background: #27105e;
+  display: flex;
+  flex-direction: column;
+  transition: transform .5s cubic-bezier(.2,.7,.1,1);
+}
+.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy {
+  transform: translateY(-96px);
+}
+.eneba-card .eneba-title {
+  flex: none;
+  height: 45px;
+  margin: 10px 11px 4px;
+  font-size: 12px;
+}
+.eneba-card .eneba-region {
+  margin: 0 11px 8px;
+  flex: none;
+}
+.eneba-card .eneba-from {
+  margin: 0 11px;
+}
+.eneba-card .eneba-price {
+  margin: 1px 11px 6px;
+}
+.eneba-card .eneba-cashback {
+  margin: auto 11px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #a3efc8;
+}
+.eneba-card .eneba-card-actions {
+  position: absolute;
+  top: 100%;
+  bottom: auto;
+  left: 0;
+  right: 0;
+  height: 96px;
+  padding: 8px 11px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+  background: #27105e;
+  transform: none;
+  transition: none;
+}
+.eneba-card .eneba-card-actions button {
+  padding: 8px 6px;
+}
+.eneba-card:hover .eneba-card-actions,.eneba-card:focus-within .eneba-card-actions {
+  transform: none;
+}
+.eneba-card .eneba-wish {
+  z-index: 5;
+}
+.eneba-track {
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  scroll-snap-type: x proximity;
+}
+.eneba-progress {
+  height: 4px;
+  background: #7859bd;
+  margin: 12px 0 24px;
+}
+.eneba-progress span {
+  min-width: 12px;
+}
+.shelf-scroll-area:hover .track-arrow {
+  opacity: 1;
+}
+.track-arrow {
+  width: 38px;
+  height: 47px;
+  background: rgba(237,231,251,.82);
+  color: #23115d;
+  border: none;
+  top: 40%;
+  font-weight: 500;
+  box-shadow: 0 2px 8px #16063d50;
+}
+.track-arrow:hover {
+  background: #fff;
+  color: #1c0a53;
+}
+.track-prev {
+  left: 0;
+}
+.track-next {
+  right: 0;
+}
+.egift-tile {
+  flex: 0 0 clamp(200px,24vw,292px);
+  height: clamp(285px,31vw,392px);
+  border: 1px solid #8874c2;
+  overflow: hidden;
+  padding: 0;
+  scroll-snap-align: start;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  transition: border-color .2s,filter .2s;
+}
+.egift-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.egift-tile:hover {
+  border-color: #f9d646;
+  filter: brightness(1.08);
+}
+.egift-tile strong {
+  font-size: 22px;
+}
+.genre-card {
+  border: 0;
+  box-shadow: 0 6px 16px #12062985;
+  min-height: 175px;
+  padding: 17px 18px;
+}
+.genre-count {
+  font-size: 14px;
+  color: #fff;
+}
+.genre-glyph img {
+  width: 48px;
+  height: 48px;
+  display: block;
+}
+.genre-card:hover {
+  background: #2d0d71;
+  box-shadow: 0 6px 16px #12062985;
+}
+@media(max-width:900px) {
+  .promo-tile {
+    height: 260px;
+  }
+  .promo-main h1 {
+    font-size: 34px;
+  }
+  .promo-small .yellow-button {
+    font-size: 8px;
+    padding: 8px 3px;
+  }
+}
+@media(max-width:620px) {
+  .promo-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+  .promo-main {
+    grid-column: 1/-1;
+    height: 238px;
+  }
+  .promo-small {
+    height: 145px;
+  }
+  .promo-small h1 {
+    font-size: 12px;
+  }
+  .promo-main .promo-content {
+    margin-left: 0;
+  }
+  .eneba-card {
+    flex-basis: 176px;
+  }
+  .eneba-art {
+    height: 224px;
+    flex-basis: 224px;
+  }
+  .egift-tile {
+    flex-basis: 205px;
+    height: 285px;
+  }
+}
+@media(hover:none) {
+  .eneba-card-copy {
+    transform: none!important;
+    flex-basis: auto;
+    height: auto;
+    padding-bottom: 90px;
+  }
+  .eneba-card .eneba-card-actions {
+    top: auto;
+    bottom: 0;
+    height: 90px;
+  }
+  .eneba-card {
+    overflow: visible;
+  }
+  .eneba-wish {
+    opacity: 1;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .eneba-card-copy {
+    transition: none;
+  }
+}
+.header-cart-svg {
+  display: block;
+}
+.cart-icon:hover .header-cart-svg {
+  stroke: #ffcf31;
+}
 /* White, unboxed icon shortcut row matching supplied screenshot. */
-.shortcuts{padding-top:28px;padding-bottom:34px}
-.shortcut-track{gap:6px;align-items:start}
-.shortcut{min-width:116px;padding:7px 4px;color:#fff;gap:11px;font-size:13px;font-weight:700}
-.shortcut-symbol{width:56px;height:51px;border:0;border-radius:0;background:transparent;color:#fff;font-size:38px}
-.shortcut-symbol svg{width:42px;height:42px;display:block}
-.shortcut-wordmark{display:grid;place-items:center;min-height:42px;font-size:30px;font-style:italic;font-weight:900;letter-spacing:-2px}
-.amazon-mark{font-family:Georgia,serif;font-style:normal;font-size:44px}
-.shortcut:hover .shortcut-symbol{color:#ffce00}
-.shortcut-arrow{color:#bfaadf;width:29px;flex:none}
+.shortcuts {
+  padding-top: 28px;
+  padding-bottom: 34px;
+}
+.shortcut-track {
+  gap: 6px;
+  align-items: start;
+}
+.shortcut {
+  min-width: 116px;
+  padding: 7px 4px;
+  color: #fff;
+  gap: 11px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.shortcut-symbol {
+  width: 56px;
+  height: 51px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 38px;
+}
+.shortcut-symbol svg {
+  width: 42px;
+  height: 42px;
+  display: block;
+}
+.shortcut-wordmark {
+  display: grid;
+  place-items: center;
+  min-height: 42px;
+  font-size: 30px;
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: -2px;
+}
+.amazon-mark {
+  font-family: Georgia,serif;
+  font-style: normal;
+  font-size: 44px;
+}
+.shortcut:hover .shortcut-symbol {
+  color: #ffce00;
+}
+.shortcut-arrow {
+  color: #bfaadf;
+  width: 29px;
+  flex: none;
+}
 /* Round, consistent small information indicators instead of glyph-dependent circled-i fonts. */
-.home-shelf-heading .round-info,.eneba-price .round-info{display:inline-grid;place-items:center;width:16px;height:16px;border:1px solid currentColor;border-radius:50%;font:600 11px/1 Arial,sans-serif;letter-spacing:0;vertical-align:middle;color:#c9b4ed;opacity:.9;margin-left:4px}
-.eneba-price .round-info{width:15px;height:15px;font-size:10px;color:#d6c6e9}
+.home-shelf-heading .round-info,.eneba-price .round-info {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font: 600 11px/1 Arial,sans-serif;
+  letter-spacing: 0;
+  vertical-align: middle;
+  color: #c9b4ed;
+  opacity: .9;
+  margin-left: 4px;
+}
+.eneba-price .round-info {
+  width: 15px;
+  height: 15px;
+  font-size: 10px;
+  color: #d6c6e9;
+}
 /* Compact category SVGs: 40 x 40px, matching the reference markup. */
-.genre-glyph{font-size:40px}
-.genre-glyph img{width:40px;height:40px;object-fit:contain}
-.genre-card{min-height:155px}
-
+.genre-glyph {
+  font-size: 40px;
+}
+.genre-glyph img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+.genre-card {
+  min-height: 155px;
+}
 /* Reference-matched shortcut icons and product-card behavior (2026-11-24). */
-.shortcut-symbol{width:40px;height:40px;border:0;border-radius:0;background:transparent;color:#fff}
-.shortcut-svg{width:auto;height:32px;max-width:40px;display:block;filter:brightness(0) invert(1)}
-.shortcut{min-width:102px;gap:7px}
-.shortcut:hover .shortcut-svg{filter:brightness(0) saturate(100%) invert(76%) sepia(81%) saturate(1356%) hue-rotate(358deg) brightness(102%)}
-.eneba-art img{transition:filter .5s ease}
-.eneba-card:hover .eneba-art img,.eneba-card:focus-within .eneba-art img{filter:brightness(.68) grayscale(.18)}
-.eneba-card-copy{position:relative;z-index:1;display:flex;flex-direction:column;flex:1;transition:transform .5s ease}
-.eneba-platform{position:relative;margin-top:-25px;height:25px;flex-shrink:0;background:rgba(10,8,21,.66);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);color:#fff}
-.eneba-card-actions{position:static;height:auto;min-height:0;max-height:0;overflow:hidden;padding:0 13px;gap:8px;transform:none;opacity:0;transition:max-height .5s ease,opacity .5s ease,padding .5s ease;background:#27105e}
-.eneba-card:hover .eneba-card-actions,.eneba-card:focus-within .eneba-card-actions{transform:none;max-height:130px;padding:11px 13px 14px;opacity:1}
-.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{transform:translateY(-4px)}
-.recently-viewed{background:#4618ac;padding-top:12px}
-.recently-viewed .home-shelf-heading{margin-bottom:27px}
-.recently-track{display:flex;overflow-x:auto;gap:14px;padding:0 0 12px;scrollbar-width:thin;scrollbar-color:#aaa0d8 transparent}
-.recently-track .eneba-card{flex:0 0 clamp(155px,16.2vw,205px)}
-@media(max-width:540px){.shortcut{min-width:90px}.recently-viewed .home-shelf-heading{margin-bottom:18px}}
-
+.shortcut-symbol {
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #fff;
+}
+.shortcut-svg {
+  width: auto;
+  height: 32px;
+  max-width: 40px;
+  display: block;
+  filter: brightness(0) invert(1);
+}
+.shortcut {
+  min-width: 102px;
+  gap: 7px;
+}
+.shortcut:hover .shortcut-svg {
+  filter: brightness(0) saturate(100%) invert(76%) sepia(81%) saturate(1356%) hue-rotate(358deg) brightness(102%);
+}
+.eneba-art img {
+  transition: filter .5s ease;
+}
+.eneba-card:hover .eneba-art img,.eneba-card:focus-within .eneba-art img {
+  filter: brightness(.68) grayscale(.18);
+}
+.eneba-card-copy {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  transition: transform .5s ease;
+}
+.eneba-platform {
+  position: relative;
+  margin-top: -25px;
+  height: 25px;
+  flex-shrink: 0;
+  background: rgba(10,8,21,.66);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  color: #fff;
+}
+.eneba-card-actions {
+  position: static;
+  height: auto;
+  min-height: 0;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 13px;
+  gap: 8px;
+  transform: none;
+  opacity: 0;
+  transition: max-height .5s ease,opacity .5s ease,padding .5s ease;
+  background: #27105e;
+}
+.eneba-card:hover .eneba-card-actions,.eneba-card:focus-within .eneba-card-actions {
+  transform: none;
+  max-height: 130px;
+  padding: 11px 13px 14px;
+  opacity: 1;
+}
+.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy {
+  transform: translateY(-4px);
+}
+.recently-viewed {
+  background: #4618ac;
+  padding-top: 12px;
+}
+.recently-viewed .home-shelf-heading {
+  margin-bottom: 27px;
+}
+.recently-track {
+  display: flex;
+  overflow-x: auto;
+  gap: 14px;
+  padding: 0 0 12px;
+  scrollbar-width: thin;
+  scrollbar-color: #aaa0d8 transparent;
+}
+.recently-track .eneba-card {
+  flex: 0 0 clamp(155px,16.2vw,205px);
+}
+@media(max-width:540px) {
+  .shortcut {
+    min-width: 90px;
+  }
+  .recently-viewed .home-shelf-heading {
+    margin-bottom: 18px;
+  }
+}
 /* Phase 5: reference-sized photographic banners, with no text painted over artwork. */
-.promo-grid{grid-template-columns:minmax(0,7fr) repeat(3,minmax(0,1fr));gap:0;padding:0;max-width:none}
-.promo-tile{height:clamp(200px,26.6667vw,400px);appearance:none;border:0;border-radius:0;display:block;cursor:pointer;background-size:cover;background-repeat:no-repeat;background-position:center;isolation:auto;padding:0}
-.promo-tile::before,.promo-tile::after{display:none!important}
-.promo-main{background-size:cover;background-position:center}
-.promo-small{background-size:cover;background-position:center}
-.promo-fallback{display:grid;place-items:center;width:100%;height:100%;font-weight:900;padding:10px;background:linear-gradient(120deg,#29105f,#4b19a9)}
-.promo-tile:focus-visible{outline:3px solid #ffce00;outline-offset:-3px;z-index:2}
+.promo-grid {
+  grid-template-columns: minmax(0,7fr) repeat(3,minmax(0,1fr));
+  gap: 0;
+  padding: 0;
+  max-width: none;
+}
+.promo-tile {
+  height: clamp(200px,26.6667vw,400px);
+  appearance: none;
+  border: 0;
+  border-radius: 0;
+  display: block;
+  cursor: pointer;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  isolation: auto;
+  padding: 0;
+}
+.promo-tile::before,.promo-tile::after {
+  display: none!important;
+}
+.promo-main {
+  background-size: cover;
+  background-position: center;
+}
+.promo-small {
+  background-size: cover;
+  background-position: center;
+}
+.promo-fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-weight: 900;
+  padding: 10px;
+  background: linear-gradient(120deg,#29105f,#4b19a9);
+}
+.promo-tile:focus-visible {
+  outline: 3px solid #ffce00;
+  outline-offset: -3px;
+  z-index: 2;
+}
 /* Keep a single moving block containing the platform strip, price and purchase buttons.
    Sliding the whole block upwards reveals actions beneath cashback. */
-.eneba-card{position:relative;overflow:hidden}
-.eneba-card-copy{flex:none!important;height:198px!important;transform:translateY(0)!important;transition:translate .5s cubic-bezier(.2,.7,.1,1)!important;z-index:3;background:#27105e}
-.eneba-card .eneba-card-actions{position:absolute!important;top:100%!important;bottom:auto!important;left:0;right:0;display:flex!important;flex-direction:column;gap:7px;height:108px!important;max-height:none!important;padding:9px 12px!important;opacity:1!important;overflow:visible!important;background:#27105e;transform:none!important}
-.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -108px!important}
-.eneba-platform{height:26px!important;margin-top:-26px!important;position:relative!important;z-index:4;background:rgba(17,14,23,.7)!important;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);font-size:11px}
-.eneba-card .eneba-cashback{margin-top:auto;margin-bottom:12px}
-.eneba-cover-link{display:block;position:absolute;inset:0;appearance:none;border:0;padding:0;background:transparent;cursor:pointer;width:100%;height:100%}
-.eneba-cover-link img{width:100%;height:100%;object-fit:cover;transition:filter .5s}
-.eneba-cover-link:focus-visible{outline:3px solid #ffce00;outline-offset:-3px}
-.eneba-card:hover .eneba-cover-link img,.eneba-card:focus-within .eneba-cover-link img{filter:brightness(.70) grayscale(.24)}
-.eneba-wish{z-index:5}
-.platform-mark{display:inline-grid;place-items:center;width:16px;height:16px;font-weight:800;border:1px solid #fff9;border-radius:50%;margin-right:4px}
-@media(max-width:620px){.promo-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.promo-main{height:220px;grid-column:1/-1}.promo-small{height:175px}.eneba-card-copy{height:198px!important}}
-@media(hover:none){.eneba-card{overflow:hidden!important}.eneba-card-copy{translate:0 0!important}.eneba-card .eneba-card-actions{position:relative!important;top:auto!important;height:auto!important}.eneba-card-copy{height:auto!important}.eneba-cover-link{inset:0}}
-@media(prefers-reduced-motion:reduce){.eneba-card-copy{transition:none!important}}
-
-.platform-logo{width:15px;height:15px;vertical-align:-3px;margin-right:5px;display:inline-block;flex:none}
-
+.eneba-card {
+  position: relative;
+  overflow: hidden;
+}
+.eneba-card-copy {
+  flex: none!important;
+  height: 198px!important;
+  transform: translateY(0)!important;
+  transition: translate .5s cubic-bezier(.2,.7,.1,1)!important;
+  z-index: 3;
+  background: #27105e;
+}
+.eneba-card .eneba-card-actions {
+  position: absolute!important;
+  top: 100%!important;
+  bottom: auto!important;
+  left: 0;
+  right: 0;
+  display: flex!important;
+  flex-direction: column;
+  gap: 7px;
+  height: 108px!important;
+  max-height: none!important;
+  padding: 9px 12px!important;
+  opacity: 1!important;
+  overflow: visible!important;
+  background: #27105e;
+  transform: none!important;
+}
+.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy {
+  translate: 0 -108px!important;
+}
+.eneba-platform {
+  height: 26px!important;
+  margin-top: -26px!important;
+  position: relative!important;
+  z-index: 4;
+  background: rgba(17,14,23,.7)!important;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  font-size: 11px;
+}
+.eneba-card .eneba-cashback {
+  margin-top: auto;
+  margin-bottom: 12px;
+}
+.eneba-cover-link {
+  display: block;
+  position: absolute;
+  inset: 0;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+.eneba-cover-link img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter .5s;
+}
+.eneba-cover-link:focus-visible {
+  outline: 3px solid #ffce00;
+  outline-offset: -3px;
+}
+.eneba-card:hover .eneba-cover-link img,.eneba-card:focus-within .eneba-cover-link img {
+  filter: brightness(.70) grayscale(.24);
+}
+.eneba-wish {
+  z-index: 5;
+}
+.platform-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  font-weight: 800;
+  border: 1px solid #fff9;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+@media(max-width:620px) {
+  .promo-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+  .promo-main {
+    height: 220px;
+    grid-column: 1/-1;
+  }
+  .promo-small {
+    height: 175px;
+  }
+  .eneba-card-copy {
+    height: 198px!important;
+  }
+}
+@media(hover:none) {
+  .eneba-card {
+    overflow: hidden!important;
+  }
+  .eneba-card-copy {
+    translate: 0 0!important;
+  }
+  .eneba-card .eneba-card-actions {
+    position: relative!important;
+    top: auto!important;
+    height: auto!important;
+  }
+  .eneba-card-copy {
+    height: auto!important;
+  }
+  .eneba-cover-link {
+    inset: 0;
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .eneba-card-copy {
+    transition: none!important;
+  }
+}
+.platform-logo {
+  width: 15px;
+  height: 15px;
+  vertical-align: -3px;
+  margin-right: 5px;
+  display: inline-block;
+  flex: none;
+}
 /* Phase 6 art and category grid refinement. Four compact, square tiles per row. */
-.genre-grid{display:grid;grid-template-columns:repeat(4,minmax(0,180px));gap:14px;justify-content:start;align-items:start;margin:22px 0 30px}
-.genre-card{width:100%;min-height:0;aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:10px;padding:18px 12px 16px;text-align:center;background:#5429ad;box-shadow:0 6px 16px #12062985;border:0;color:#fff}
-.genre-card:hover{background:#2d0d71;box-shadow:0 6px 16px #12062985}
-.genre-count{font-size:13px;font-weight:600;text-align:center;line-height:1.2;color:#fff}
-.genre-glyph{font-size:0;flex:1;display:flex;justify-content:center;align-items:center;align-self:stretch;min-height:40px}
-.genre-glyph img{display:block;width:40px;height:40px;max-width:40px;max-height:40px;object-fit:contain;filter:brightness(0) invert(1)}
-.genre-card strong{font-size:15px;line-height:1.2;text-align:center;font-weight:600}
-@media(max-width:800px){.genre-grid{grid-template-columns:repeat(3,minmax(0,180px))}}
-@media(max-width:530px){.genre-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.genre-card{max-width:180px}}
-
+.genre-grid {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,180px));
+  gap: 14px;
+  justify-content: start;
+  align-items: start;
+  margin: 22px 0 30px;
+}
+.genre-card {
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 1/1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 18px 12px 16px;
+  text-align: center;
+  background: #5429ad;
+  box-shadow: 0 6px 16px #12062985;
+  border: 0;
+  color: #fff;
+}
+.genre-card:hover {
+  background: #2d0d71;
+  box-shadow: 0 6px 16px #12062985;
+}
+.genre-count {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  color: #fff;
+}
+.genre-glyph {
+  font-size: 0;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  align-self: stretch;
+  min-height: 40px;
+}
+.genre-glyph img {
+  display: block;
+  width: 40px;
+  height: 40px;
+  max-width: 40px;
+  max-height: 40px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+.genre-card strong {
+  font-size: 15px;
+  line-height: 1.2;
+  text-align: center;
+  font-weight: 600;
+}
+@media(max-width:800px) {
+  .genre-grid {
+    grid-template-columns: repeat(3,minmax(0,180px));
+  }
+}
+@media(max-width:530px) {
+  .genre-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 10px;
+  }
+  .genre-card {
+    max-width: 180px;
+  }
+}
 /* Homepage categories: six compact square tiles per desktop row. */
-.genre-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
-.genre-card{max-width:180px;width:100%;justify-self:center}
-@media(max-width:1050px){.genre-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:700px){.genre-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:480px){.genre-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-
+.genre-grid {
+  grid-template-columns: repeat(6,minmax(0,1fr));
+  gap: 12px;
+}
+.genre-card {
+  max-width: 180px;
+  width: 100%;
+  justify-self: center;
+}
+@media(max-width:1050px) {
+  .genre-grid {
+    grid-template-columns: repeat(4,minmax(0,1fr));
+  }
+}
+@media(max-width:700px) {
+  .genre-grid {
+    grid-template-columns: repeat(3,minmax(0,1fr));
+  }
+}
+@media(max-width:480px) {
+  .genre-grid {
+    grid-template-columns: repeat(2,minmax(0,1fr));
+  }
+}
 /* Phase 6 card polish */
-.eneba-card{overflow:hidden}
-.eneba-card-copy{height:178px!important;transform:translateY(0)!important;transition:translate .45s cubic-bezier(.2,.7,.1,1)!important;background:#27105e}
-.eneba-card .eneba-card-actions{top:100%!important;height:98px!important;padding:8px 10px 10px!important;gap:6px!important;background:#27105e}
-.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -98px!important}
-.eneba-card .eneba-title{height:39px!important;line-height:1.27!important;margin:8px 10px 3px!important}
-.eneba-card .eneba-region{margin:0 10px 6px!important}
-.eneba-card .eneba-from{margin:0 10px!important;line-height:1.08}
-.eneba-card .eneba-price{margin:1px 10px 2px!important;line-height:1.04}
-.eneba-card .eneba-cashback{margin:0 10px 7px!important;font-size:11px!important;font-weight:800!important;display:flex;align-items:center;gap:5px;line-height:1.15}
-.eneba-card .eneba-platform{height:24px!important;margin-top:-24px!important;font-size:10px!important;gap:5px!important;padding:0 8px!important;display:flex;align-items:center;justify-content:center}
-.platform-logo{width:15px;height:15px;display:inline-block;flex:none;color:#fff}
-.platform-logo-image{object-fit:contain;filter:drop-shadow(0 0 0 rgba(0,0,0,0))}
-.cashback-badge{display:inline-flex!important;align-items:center!important;gap:6px!important;bottom:24px!important;padding:6px 10px!important;font-size:11px!important;font-weight:900!important;line-height:1}
-.cashback-badge svg,.cashback-inline-icon svg{width:14px;height:14px;display:block}
-.cashback-inline-icon{display:inline-flex;align-items:center;justify-content:center;color:#8ddfba}
-@media(max-width:620px){.eneba-card-copy{height:176px!important}.eneba-card .eneba-card-actions{height:94px!important}.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -94px!important}}
+.eneba-card {
+  overflow: hidden;
+}
+.eneba-card-copy {
+  height: 178px!important;
+  transform: translateY(0)!important;
+  transition: translate .45s cubic-bezier(.2,.7,.1,1)!important;
+  background: #27105e;
+}
+.eneba-card .eneba-card-actions {
+  top: 100%!important;
+  height: 98px!important;
+  padding: 8px 10px 10px!important;
+  gap: 6px!important;
+  background: #27105e;
+}
+.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy {
+  translate: 0 -98px!important;
+}
+.eneba-card .eneba-title {
+  height: 39px!important;
+  line-height: 1.27!important;
+  margin: 8px 10px 3px!important;
+}
+.eneba-card .eneba-region {
+  margin: 0 10px 6px!important;
+}
+.eneba-card .eneba-from {
+  margin: 0 10px!important;
+  line-height: 1.08;
+}
+.eneba-card .eneba-price {
+  margin: 1px 10px 2px!important;
+  line-height: 1.04;
+}
+.eneba-card .eneba-cashback {
+  margin: 0 10px 7px!important;
+  font-size: 11px!important;
+  font-weight: 800!important;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  line-height: 1.15;
+}
+.eneba-card .eneba-platform {
+  height: 24px!important;
+  margin-top: -24px!important;
+  font-size: 10px!important;
+  gap: 5px!important;
+  padding: 0 8px!important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.platform-logo {
+  width: 15px;
+  height: 15px;
+  display: inline-block;
+  flex: none;
+  color: #fff;
+}
+.platform-logo-image {
+  object-fit: contain;
+  filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+}
+.cashback-badge {
+  display: inline-flex!important;
+  align-items: center!important;
+  gap: 6px!important;
+  bottom: 24px!important;
+  padding: 6px 10px!important;
+  font-size: 11px!important;
+  font-weight: 900!important;
+  line-height: 1;
+}
+.cashback-badge svg,.cashback-inline-icon svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+.cashback-inline-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #8ddfba;
+}
+@media(max-width:620px) {
+  .eneba-card-copy {
+    height: 176px!important;
+  }
+  .eneba-card .eneba-card-actions {
+    height: 94px!important;
+  }
+  .eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy {
+    translate: 0 -94px!important;
+  }
+}
 /* Self-hosted platform marks render white against the translucent platform strip. */
-.eneba-platform .platform-logo-image{filter:brightness(0) invert(1);width:15px;height:15px;object-fit:contain}
-
+.eneba-platform .platform-logo-image {
+  filter: brightness(0) invert(1);
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
+}
 /* One tight metadata stack across home, store, and cart recommendations. */
-.eneba-card .eneba-card-copy{height:150px!important}
-.eneba-card .eneba-cashback{color:#9ce74b!important;margin:0 10px 4px!important;line-height:1!important;flex-shrink:0}
-.eneba-card .eneba-title{margin-top:7px!important;height:38px!important}
-.eneba-card .eneba-region{margin-bottom:5px!important}
-.eneba-card .eneba-price{margin-bottom:1px!important}
-@media (max-width:620px){.eneba-card .eneba-card-copy{height:150px!important}}
-
-@media (hover:none){.eneba-card .eneba-card-copy{height:auto!important}.eneba-card .eneba-cashback{margin-bottom:5px!important}}
-
+.eneba-card .eneba-card-copy {
+  height: 150px!important;
+}
+.eneba-card .eneba-cashback {
+  color: #9ce74b!important;
+  margin: 0 10px 4px!important;
+  line-height: 1!important;
+  flex-shrink: 0;
+}
+.eneba-card .eneba-title {
+  margin-top: 7px!important;
+  height: 38px!important;
+}
+.eneba-card .eneba-region {
+  margin-bottom: 5px!important;
+}
+.eneba-card .eneba-price {
+  margin-bottom: 1px!important;
+}
+@media (max-width:620px) {
+  .eneba-card .eneba-card-copy {
+    height: 150px!important;
+  }
+}
+@media (hover:none) {
+  .eneba-card .eneba-card-copy {
+    height: auto!important;
+  }
+  .eneba-card .eneba-cashback {
+    margin-bottom: 5px!important;
+  }
+}
 /* Follow-up card fixes: centered wishlist heart, tighter bottom spacing, and gift-card icon fallback. */
-.eneba-wish{display:grid!important;place-items:center!important;padding:0!important;line-height:0!important}
-.eneba-wish svg{display:block;width:22px;height:22px}
-.eneba-card .eneba-card-copy{height:144px!important}
-.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -92px!important}
-.eneba-card .eneba-card-actions{height:92px!important}
-.eneba-card .eneba-title{margin-top:6px!important;height:34px!important}
-.eneba-card .eneba-region{margin-bottom:4px!important}
-.eneba-card .eneba-price{margin-bottom:0!important}
-.eneba-card .eneba-cashback{color:#9ce74b!important;margin:0 10px 2px!important;line-height:1!important}
-.gift-platform-logo{width:15px;height:15px;color:#fff}
-@media(max-width:620px){.eneba-card .eneba-card-copy{height:144px!important}.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -92px!important}.eneba-card .eneba-card-actions{height:92px!important}}
-@media (hover:none){.eneba-card .eneba-card-copy{height:auto!important}}
+.eneba-wish {
+  display: grid!important;
+  place-items: center!important;
+  padding: 0!important;
+  line-height: 0!important;
+}
+.eneba-wish svg {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+.eneba-card .eneba-card-copy {
+  height: 144px!important;
+}
+.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy {
+  translate: 0 -92px!important;
+}
+.eneba-card .eneba-card-actions {
+  height: 92px!important;
+}
+.eneba-card .eneba-title {
+  margin-top: 6px!important;
+  height: 34px!important;
+}
+.eneba-card .eneba-region {
+  margin-bottom: 4px!important;
+}
+.eneba-card .eneba-price {
+  margin-bottom: 0!important;
+}
+.eneba-card .eneba-cashback {
+  color: #9ce74b!important;
+  margin: 0 10px 2px!important;
+  line-height: 1!important;
+}
+.gift-platform-logo {
+  width: 15px;
+  height: 15px;
+  color: #fff;
+}
+@media(max-width:620px) {
+  .eneba-card .eneba-card-copy {
+    height: 144px!important;
+  }
+  .eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy {
+    translate: 0 -92px!important;
+  }
+  .eneba-card .eneba-card-actions {
+    height: 92px!important;
+  }
+}
+@media (hover:none) {
+  .eneba-card .eneba-card-copy {
+    height: auto!important;
+  }
+}
+
