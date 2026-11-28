@@ -221,6 +221,43 @@ func NewRouter(pool *pgxpool.Pool, repo Catalog, corsOrigin string) *gin.Engine 
 		}
 		c.JSON(200, gin.H{"data": product})
 	})
+	// User-backed favorites: counts are derived from persisted user selections.
+	// GET works anonymously; adding/removing requires a valid session cookie.
+	getFavorite := func(c *gin.Context) {
+		slug := c.Param("slug")
+		var productID int64
+		if err := pool.QueryRow(c.Request.Context(), `SELECT id FROM products WHERE slug=$1`, slug).Scan(&productID); err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "product not found"})
+			return
+		}
+		userID, loggedIn := store.User(c)
+		if c.Request.Method == http.MethodPost || c.Request.Method == http.MethodDelete {
+			if !loggedIn {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Please sign in first"})
+				return
+			}
+			var err error
+			if c.Request.Method == http.MethodPost {
+				_, err = pool.Exec(c.Request.Context(), `INSERT INTO product_favorites(user_id, product_id) VALUES($1,$2) ON CONFLICT DO NOTHING`, userID, productID)
+			} else {
+				_, err = pool.Exec(c.Request.Context(), `DELETE FROM product_favorites WHERE user_id=$1 AND product_id=$2`, userID, productID)
+			}
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "could not update favorites"})
+				return
+			}
+		}
+		var count int64
+		var saved bool
+		if err := pool.QueryRow(c.Request.Context(), `SELECT COUNT(*)::bigint, COALESCE(BOOL_OR(user_id = $2), FALSE) FROM product_favorites WHERE product_id=$1`, productID, userID).Scan(&count, &saved); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "could not load favorites"})
+			return
+		}
+		c.JSON(http.StatusOK, gin.H{"data": gin.H{"count": count, "saved": loggedIn && saved}})
+	}
+	v1.GET("/products/:slug/favorites", getFavorite)
+	v1.POST("/products/:slug/favorites", getFavorite)
+	v1.DELETE("/products/:slug/favorites", getFavorite)
 	v1.GET("/products/:slug/offers", func(c *gin.Context) {
 		offers, err := repo.OffersBySlug(c.Request.Context(), c.Param("slug"))
 		if errors.Is(err, catalog.ErrNotFound) {

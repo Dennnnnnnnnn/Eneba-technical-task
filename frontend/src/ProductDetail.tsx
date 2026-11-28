@@ -1,5 +1,6 @@
 import {useEffect, useMemo, useState} from 'react';
 import type {Offer, Product} from './api';
+import {getFavorites,setFavorite} from './api';
 import './product-page.css';
 import {HeartIcon,CartIcon} from './UiIcons';
 
@@ -18,6 +19,13 @@ function Icon({kind}:{kind:'check'|'key'|'refund'|'desktop'|'globe'|'cart'|'hear
  return <svg {...common}><circle cx="12" cy="12" r="10"/><path d="M12 10v7M12 6.5v.2"/></svg>;
 }
 
+function ActivationPlatformIcon({platform,title}:{platform:string;title:string}){
+ const t=title.toLowerCase();
+ const filename=t.includes('steam')?'steam':t.includes('roblox')?'':t.includes('gog')?'':platform==='PlayStation'?'psn':platform==='Xbox'?'xbox':platform==='Switch'?'nintendo':platform==='PC'?'steam':'';
+ if(filename)return <img className="pd-activation-logo" src={`/shortcut-icons/${filename}.svg`} alt="" aria-hidden="true"/>;
+ if(platform==='PC')return <Icon kind="desktop"/>;
+ return <Icon kind="key"/>;
+}
 type Props={product:Product;offers:Offer[];busy:boolean;error:string;onAdd:(id:number)=>void;onCart:()=>void;onSignIn:()=>void;authenticated:boolean;onNotice:(message:string)=>void};
 export default function ProductDetail({product,offers,busy,error,onAdd,onCart,onSignIn,authenticated,onNotice}:Props){
  const sorted=useMemo(()=>[...offers].sort((a,b)=>a.priceCents-b.priceCents),[offers]);
@@ -25,14 +33,25 @@ export default function ProductDetail({product,offers,busy,error,onAdd,onCart,on
  const [region,setRegion]=useState('ALL');
  const [expanded,setExpanded]=useState(false);
  const [wishlist,setWishlist]=useState(false);
- useEffect(()=>{setRegion('ALL');setExpanded(false);setWishlist(false)},[product.slug]);
+ const [favoriteCount,setFavoriteCount]=useState<number|null>(null);
+ const [favoriteBusy,setFavoriteBusy]=useState(false);
+ useEffect(()=>{
+  const controller=new AbortController();
+  setRegion('ALL');setExpanded(false);setWishlist(false);setFavoriteCount(null);
+  getFavorites(product.slug,controller.signal).then(result=>{if(!controller.signal.aborted){setWishlist(result.saved);setFavoriteCount(result.count)}}).catch(()=>{if(!controller.signal.aborted)onNotice('Could not load favorites')});
+  return()=>controller.abort();
+ },[product.slug,authenticated]);
+ async function toggleFavorite(){
+  if(!authenticated){onSignIn();return}
+  if(favoriteBusy)return;setFavoriteBusy(true);
+  try{const state=await setFavorite(product.slug,!wishlist);setWishlist(state.saved);setFavoriteCount(state.count)}
+  catch{onNotice('Could not update favorites')}finally{setFavoriteBusy(false)}
+ }
  const eligible=sorted.filter(o=>region==='ALL'||o.region===region);
  const recommended=eligible.slice(0,2);
  const rest=eligible.slice(2);
  const listed=expanded?rest:rest.slice(0,3);
  const featured=recommended[0];
- const favoriteCount=6767 + ((product.id||0)%9)*37;
- const cashback=(amount:number)=>money(Math.round(amount*(product.cashbackPercent||0)/100),featured?.currency||'EUR');
  const platform=(product.title.toLowerCase().includes('gog')?'GOG.com':product.platform==='PC'?'PC':product.platform);
  const activation=platform==='GOG.com'?'GOG.com':product.platform==='PC'?'the indicated PC launcher':product.platform;
  function putInCart(id:number){onAdd(id)}
@@ -44,11 +63,11 @@ export default function ProductDetail({product,offers,busy,error,onAdd,onCart,on
   </div>
  </article>;
  return <div className="pd-layout"><div className="pd-main">
-  <section className="pd-intro"><div className="pd-cover" style={{background:product.coverColor}}>{product.coverImageUrl?<img src={product.coverImageUrl} alt={`${product.title} game cover`}/>:<strong>{product.title}</strong>}</div><div className="pd-overview"><span className="pd-cashback-pill">Cashback deal</span><h1>{product.title}</h1><div className="pd-features"><div className="pd-feature"><Icon kind="check"/><div><strong>Can be activated in Lithuania*</strong><span>Check region restrictions</span></div></div><div className="pd-feature"><Icon kind="globe"/><div><strong>{activation}</strong><span>Check activation instructions</span></div></div><div className="pd-feature"><Icon kind="key"/><div><strong>Digital edition (CD-KEY)</strong><em>Delivery after demo checkout</em></div></div><div className="pd-feature"><Icon kind="refund"/><div><strong>Refund availability</strong><span>Demo purchases are nonredeemable; no payments taken</span></div></div></div><div className="pd-compat"><span><Icon kind="desktop"/> Works on: <strong>{product.platform==='PC'?'Windows':product.platform}</strong></span><button type="button" onClick={()=>onNotice('Detailed system requirements are not yet provided by the catalog API.')}>Check requirements</button></div><p className="pd-region-footnote">*Region compatibility is illustrative. Check the specific offer region before buying.</p></div><button type="button" className={`pd-favorite ${wishlist?'pd-favorite-active':''}`} aria-pressed={wishlist} aria-label={wishlist?'Remove from local wishlist':'Save to local wishlist'} onClick={()=>setWishlist(v=>!v)}><Icon kind="heart"/><span>{favoriteCount}</span></button></section>
+  <section className="pd-intro"><div className="pd-cover" style={{background:product.coverColor}}>{product.coverImageUrl?<img src={product.coverImageUrl} alt={`${product.title} game cover`}/>:<strong>{product.title}</strong>}</div><div className="pd-overview"><span className="pd-cashback-pill">Cashback deal</span><h1>{product.title}</h1><div className="pd-features"><div className="pd-feature"><Icon kind="check"/><div><strong>Can be activated in Lithuania*</strong><span>Check region restrictions</span></div></div><div className="pd-feature"><ActivationPlatformIcon platform={product.platform} title={product.title}/><div><strong>{activation}</strong><span>Check activation instructions</span></div></div><div className="pd-feature"><Icon kind="key"/><div><strong>Digital edition (CD-KEY)</strong><em>Delivery after demo checkout</em></div></div><div className="pd-feature"><Icon kind="refund"/><div><strong>Refund availability</strong><span>Demo purchases are nonredeemable; no payments taken</span></div></div></div><div className="pd-compat"><span><Icon kind="desktop"/> Works on: <strong>{product.platform==='PC'?'Windows':product.platform}</strong></span><button type="button" onClick={()=>onNotice('Detailed system requirements are not yet provided by the catalog API.')}>Check requirements</button></div><p className="pd-region-footnote">*Region compatibility is illustrative. Check the specific offer region before buying.</p></div><button type="button" className={`pd-favorite ${wishlist?'pd-favorite-active':''}`} aria-pressed={wishlist} aria-label={wishlist?'Remove from wishlist':'Add to wishlist'} disabled={favoriteBusy} onClick={toggleFavorite}><Icon kind="heart"/><span>{favoriteCount===null?"—":favoriteCount.toLocaleString()}</span></button></section>
   <div className="pd-region-chooser"><label htmlFor="pd-region">Region</label><div className="pd-region-select"><Icon kind="globe"/><select id="pd-region" value={region} onChange={e=>setRegion(e.target.value)}><option value="ALL">All regions</option>{regions.map(r=><option key={r} value={r}>{r}</option>)}</select><span aria-hidden="true">⌄</span></div></div>
   <div className="pd-notice"><Icon kind="info"/><p><strong>Important Notice:</strong> This is a simulated marketplace with fictional digital keys. {platform==='GOG.com'?'This listing refers to GOG.com; it is not a Steam key.':`Activation instructions and region restrictions depend on the seller offer and platform (${activation}).`}</p></div>
   <section className="pd-offers-section"><h2>Recommended offers <span title="Offers with the lowest prices among the selected region"><Icon kind="info"/></span></h2>{error&&<p role="alert" className="form-error">{error}</p>}{recommended.length?<div className="pd-offers-list">{recommended.map((o,i)=>row(o,i,true))}</div>:<p className="pd-no-offers">No offers available for that region.</p>}</section>
   {rest.length>0&&<section className="pd-offers-section"><h2><span className="pd-green">{rest.length}</span> other offers</h2><div className="pd-offers-list">{listed.map((o,i)=>row(o,i,false))}</div>{rest.length>3&&<div className="pd-more"><button type="button" onClick={()=>setExpanded(v=>!v)}>{expanded?'Show fewer offers':`Load ${rest.length-3} more offers`}</button></div>}</section>}
   <section className="pd-description"><h2>About this game</h2><p>{product.description}</p><p>Digital product · {product.platform} · Region restrictions depend on the offer.</p></section>
- </div><aside className="pd-aside"><div className="pd-aside-sticky"><div className="pd-trust-heading"><span>Secure demo purchase</span><span aria-hidden="true">★★★★★</span></div><div className="pd-buy-box">{featured?<><span className="pd-aside-eyebrow">FEATURED OFFER</span><div className="pd-aside-price">{money(featured.priceCents,featured.currency)}</div><div className="pd-price-caveat">Demo price · No real payment <Icon kind="info"/></div>{product.cashbackPercent>0&&<p className="pd-aside-cashback">{product.cashbackPercent}% demo cashback <small>Illustrative: {cashback(featured.priceCents)}</small></p>}<button type="button" className="pd-paypal" disabled={busy} onClick={()=>fakePayPal(featured.id)}>PayPal <small>(demo)</small></button><div className="pd-side-buttons"><button type="button" className="pd-buy-yellow" disabled={busy} onClick={()=>putInCart(featured.id)}>{busy?'Adding…':'Buy now'}</button><button type="button" className="pd-side-cart" disabled={busy} title="Add to cart" aria-label="Add featured offer to cart" onClick={()=>putInCart(featured.id)}><Icon kind="cart"/></button></div><div className="pd-offer-footer"><button type="button" onClick={()=>document.getElementById('pd-region')?.focus()}>{rest.length+recommended.length-1} other offers from {money(eligible[1]?.priceCents??featured.priceCents,featured.currency)} <span>⌄</span></button></div></>:<div className="pd-no-offers">No available offer in this region.</div>}</div><div className="pd-checkout-safe"><h3>Safe Checkout Guaranteed</h3><div className="pd-payment-methods"><span>VISA</span><span>Mastercard</span><span>PayPal</span><span>Apple Pay</span></div><p>Payment simulation only. No third-party verification, endorsement or real payment processing is claimed.</p>{authenticated?<button type="button" onClick={onCart}>View your cart →</button>:<button type="button" onClick={onSignIn}>Sign in to purchase →</button>}</div></div></aside></div>;
+ </div><aside className="pd-aside"><div className="pd-aside-sticky"><div className="pd-trust-heading"><span>Secure demo purchase</span><span aria-hidden="true">★★★★★</span></div><div className="pd-buy-box">{featured?<><span className="pd-aside-eyebrow">FEATURED OFFER</span><div className="pd-aside-price">{money(featured.priceCents,featured.currency)}</div><div className="pd-price-caveat">Demo price · No real payment <Icon kind="info"/></div>{product.cashbackPercent>0&&<p className="pd-aside-cashback">{product.cashbackPercent}% demo cashback </p>}<button type="button" className="pd-paypal" disabled={busy} onClick={()=>fakePayPal(featured.id)}>PayPal <small>(demo)</small></button><div className="pd-side-buttons"><button type="button" className="pd-buy-yellow" disabled={busy} onClick={()=>putInCart(featured.id)}>{busy?'Adding…':'Buy now'}</button><button type="button" className="pd-side-cart" disabled={busy} title="Add to cart" aria-label="Add featured offer to cart" onClick={()=>putInCart(featured.id)}><Icon kind="cart"/></button></div><div className="pd-offer-footer"><button type="button" onClick={()=>document.getElementById('pd-region')?.focus()}>{rest.length+recommended.length-1} other offers from {money(eligible[1]?.priceCents??featured.priceCents,featured.currency)} <span>⌄</span></button></div></>:<div className="pd-no-offers">No available offer in this region.</div>}</div><div className="pd-checkout-safe"><h3>Safe Checkout Guaranteed</h3><div className="pd-payment-methods"><span>VISA</span><span>Mastercard</span><span>PayPal</span><span>Apple Pay</span></div><p>Payment simulation only. No third-party verification, endorsement or real payment processing is claimed.</p>{authenticated?<button type="button" onClick={onCart}>View your cart →</button>:<button type="button" onClick={onSignIn}>Sign in to purchase →</button>}</div></div></aside></div>;
 }

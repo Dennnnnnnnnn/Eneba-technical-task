@@ -17,3 +17,7 @@
 .pd-buy-yellow:hover{background:#e5a93d}
 .pd-side-cart:hover{border-color:#e5a93d;color:#e5a93d}
 .pd-side-cart svg{max-width:18px;min-width:18px;height:auto}
+
+/* Activation icon comes from the actual product platform, not the region globe. */
+.pd-feature>.pd-activation-logo{width:26px;height:26px;min-width:26px;object-fit:contain;filter:brightness(0) invert(1)}
+.pd-aside-cashback{color:#9ce74b}

@@ -160,3 +160,13 @@
 @media(max-width:620px){.eneba-card-copy{height:176px!important}.eneba-card .eneba-card-actions{height:94px!important}.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -94px!important}}
 /* Self-hosted platform marks render white against the translucent platform strip. */
 .eneba-platform .platform-logo-image{filter:brightness(0) invert(1);width:15px;height:15px;object-fit:contain}
+
+/* One tight metadata stack across home, store, and cart recommendations. */
+.eneba-card .eneba-card-copy{height:150px!important}
+.eneba-card .eneba-cashback{color:#9ce74b!important;margin:0 10px 4px!important;line-height:1!important;flex-shrink:0}
+.eneba-card .eneba-title{margin-top:7px!important;height:38px!important}
+.eneba-card .eneba-region{margin-bottom:5px!important}
+.eneba-card .eneba-price{margin-bottom:1px!important}
+@media (max-width:620px){.eneba-card .eneba-card-copy{height:150px!important}}
+
+@media (hover:none){.eneba-card .eneba-card-copy{height:auto!important}.eneba-card .eneba-cashback{margin-bottom:5px!important}}
