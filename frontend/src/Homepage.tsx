@@ -76,7 +76,6 @@ function GiftIcon(){return <svg className="platform-logo gift-platform-logo" vie
 
 export function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug:string)=>void;onAdd:(p:Product)=>void;onWish:(p:Product)=>void}){
  const [failed,setFailed]=useState(false);
- const lowerTitle=product.title.toLowerCase();
  const platform=resolvePlatformLabel(product);
  const region=product.region==='EU'?'EUROPE':product.region==='US'?'UNITED STATES':product.region;
  const cashback=Math.round(product.minPriceCents*(product.cashbackPercent??0)/100);
