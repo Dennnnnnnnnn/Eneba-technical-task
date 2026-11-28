@@ -170,3 +170,17 @@
 @media (max-width:620px){.eneba-card .eneba-card-copy{height:150px!important}}
 
 @media (hover:none){.eneba-card .eneba-card-copy{height:auto!important}.eneba-card .eneba-cashback{margin-bottom:5px!important}}
+
+/* Follow-up card fixes: centered wishlist heart, tighter bottom spacing, and gift-card icon fallback. */
+.eneba-wish{display:grid!important;place-items:center!important;padding:0!important;line-height:0!important}
+.eneba-wish svg{display:block;width:22px;height:22px}
+.eneba-card .eneba-card-copy{height:144px!important}
+.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -92px!important}
+.eneba-card .eneba-card-actions{height:92px!important}
+.eneba-card .eneba-title{margin-top:6px!important;height:34px!important}
+.eneba-card .eneba-region{margin-bottom:4px!important}
+.eneba-card .eneba-price{margin-bottom:0!important}
+.eneba-card .eneba-cashback{color:#9ce74b!important;margin:0 10px 2px!important;line-height:1!important}
+.gift-platform-logo{width:15px;height:15px;color:#fff}
+@media(max-width:620px){.eneba-card .eneba-card-copy{height:144px!important}.eneba-card:hover .eneba-card-copy,.eneba-card:focus-within .eneba-card-copy{translate:0 -92px!important}.eneba-card .eneba-card-actions{height:92px!important}}
+@media (hover:none){.eneba-card .eneba-card-copy{height:auto!important}}

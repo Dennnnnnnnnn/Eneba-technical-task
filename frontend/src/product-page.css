@@ -21,3 +21,10 @@
 /* Activation icon comes from the actual product platform, not the region globe. */
 .pd-feature>.pd-activation-logo{width:26px;height:26px;min-width:26px;object-fit:contain;filter:brightness(0) invert(1)}
 .pd-aside-cashback{color:#9ce74b}
+
+/* Follow-up item-page fixes. */
+.pd-description-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.pd-description-platform{display:inline-flex;align-items:center;gap:6px}
+.pd-description-platform .pd-activation-logo,.pd-description-platform .pd-feature-icon,.pd-description-platform svg{width:16px;height:16px;min-width:16px}
+.pd-view-cart-button{background:#f4d44b;color:#201047;border:0;padding:10px 12px;width:100%;font-weight:900;transition:background-color .18s ease,color .18s ease}
+.pd-view-cart-button:hover{background:#e5a93d}

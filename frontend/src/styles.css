@@ -274,3 +274,7 @@ html,body,.site-shell{background:#4618AC}
 .store-results .eneba-card-copy,.inspired-grid .eneba-card-copy{height:150px!important}
 
 @media (hover:none){.store-results .eneba-card-copy,.inspired-grid .eneba-card-copy{height:auto!important}}
+
+/* Follow-up fixes: use image flags rather than CSS approximations. */
+.locale-flag-image{display:inline-block;width:16px;height:16px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.2);flex:none;background:none}
+.locale-flag.flag-united-kingdom,.locale-flag.flag-united-kingdom::before{background:none!important;display:inline-block}
