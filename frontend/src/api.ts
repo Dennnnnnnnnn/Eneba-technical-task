@@ -33,6 +33,10 @@ export function fetchProducts(filters:Filters,signal?:AbortSignal){
 }
 export const fetchProduct=(slug:string,signal?:AbortSignal)=>fromApi<Product>(`/api/v1/products/${encodeURIComponent(slug)}`,signal);
 export const fetchOffers=(slug:string,signal?:AbortSignal)=>fromApi<Offer[]>(`/api/v1/products/${encodeURIComponent(slug)}/offers`,signal);
+export type FavoriteSummary={count:number;saved:boolean};
+export const getFavorites=(slug:string,signal?:AbortSignal)=>fromApi<FavoriteSummary>(`/api/v1/products/${encodeURIComponent(slug)}/favorites`,signal);
+export const setFavorite=(slug:string,saved:boolean)=>request<FavoriteSummary>(`/api/v1/products/${encodeURIComponent(slug)}/favorites`,{method:saved?'POST':'DELETE'});
+
 
 export type Account = {id:number;email:string};
 export type CartItem = {offerId:number;slug:string;title:string;platform:string;coverImageUrl:string;seller:string;region:string;priceCents:number;currency:string;available:boolean;cashbackPercent:number};

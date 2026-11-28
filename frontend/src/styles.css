@@ -258,3 +258,23 @@ html,body,.site-shell{background:#4618AC}
 .toast-floating button{margin-left:12px;cursor:pointer}
 @keyframes toast-enter{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.toast-floating{animation:none}}
+
+/* Phase 6 interaction refinements */
+.popover-remove,.checkout-remove{transition:color .18s ease,border-color .18s ease,background-color .18s ease}
+.popover-remove:hover,.checkout-remove:hover{color:#e53d50}
+.checkout-wish svg,.topbar .heart-header svg{max-width:24px;min-width:24px;height:auto}
+.topbar .cart-icon svg,.pd-side-cart svg,.pd-hover-actions button svg{max-width:18px;min-width:18px;height:auto}
+
+/* Locale and cart refinements: reliable, correctly proportioned UK flag. */
+.locale-flag.flag-united-kingdom{background:#012169 url('/flags/uk.svg') center/cover no-repeat;overflow:hidden;border-radius:50%;width:17px;height:17px;flex-shrink:0}
+.locale-flag.flag-united-kingdom::before{display:none}
+.cart-popover-primary{background:#f4d44b;color:#201047;transition:background-color .2s ease}
+.cart-popover-primary:hover{background:#e5a93d}
+/* Remove legacy fixed 198px card height on store and cart recommendations. */
+.store-results .eneba-card-copy,.inspired-grid .eneba-card-copy{height:150px!important}
+
+@media (hover:none){.store-results .eneba-card-copy,.inspired-grid .eneba-card-copy{height:auto!important}}
+
+/* Follow-up fixes: use image flags rather than CSS approximations. */
+.locale-flag-image{display:inline-block;width:16px;height:16px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.2);flex:none;background:none}
+.locale-flag.flag-united-kingdom,.locale-flag.flag-united-kingdom::before{background:none!important;display:inline-block}

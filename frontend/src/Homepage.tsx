@@ -42,9 +42,41 @@ function ShortcutIcon({name,label}:{name:string;label:string}){
  return file?<img className="shortcut-svg" src={`/shortcut-icons/${file}.svg`} alt="" loading="lazy"/>:<svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">{shortcutPaths[name]??shortcutPaths.gamepad}</svg>;
 }
 const money=(cents:number,currency='EUR')=>new Intl.NumberFormat('en-IE',{style:'currency',currency}).format(cents/100);
+function CashbackIcon(){return <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g clipPath="url(#cashbackBadgeClip)"><path d="M6.55768 14.5095C8.12445 14.8566 9.76387 14.6269 11.1749 13.8626C12.586 13.0983 13.674 11.8506 14.2392 10.3487C14.8044 8.84672 14.8088 7.1913 14.2517 5.68633C13.6946 4.18137 12.6134 2.92785 11.2065 2.15593C9.79954 1.384 8.1614 1.14548 6.59277 1.48414C5.02415 1.8228 3.6303 2.71594 2.66718 3.99953C1.70407 5.28313 1.23625 6.87109 1.34969 8.47182C1.46308 10.0726 2.15012 11.5787 3.28463 12.7137L4.37371 13.8028M1.47198 13.8013H4.37233V10.901" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/><path d="M8 5.33398V8.00065V10.6673" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/><path d="M5.33301 8H10.6663" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round"/></g><defs><clipPath id="cashbackBadgeClip"><rect width="16" height="16" fill="white"/></clipPath></defs></svg>}
+
+function resolvePlatformLabel(product:Product){
+ const lowerTitle=product.title.toLowerCase();
+ if(product.platform==='PlayStation'||lowerTitle.includes('playstation')||lowerTitle.includes('psn')||lowerTitle.includes('ps5')) return 'PSN';
+ if(product.platform==='Xbox'||lowerTitle.includes('xbox')) return 'Xbox Live';
+ if(product.platform==='Switch'||lowerTitle.includes('nintendo')||lowerTitle.includes('switch')) return 'Nintendo';
+ if(product.platform==='Windows') return 'Windows Store';
+ if(product.platform==='PC'){
+  if(lowerTitle.includes('steam')) return 'Steam';
+  if(lowerTitle.includes('gog')) return 'GOG.com';
+  if(lowerTitle.includes('ea app')) return 'EA app';
+  return 'PC';
+ }
+ if(product.platform==='Gift Card'){
+  if(lowerTitle.includes('roblox')) return 'Roblox';
+  if(lowerTitle.includes('playstation')||lowerTitle.includes('psn')) return 'PSN';
+  if(lowerTitle.includes('steam')) return 'Steam';
+  if(lowerTitle.includes('xbox')) return 'Xbox Live';
+  if(lowerTitle.includes('nintendo')) return 'Nintendo';
+  if(lowerTitle.includes('spotify')) return 'Spotify';
+  if(lowerTitle.includes('netflix')) return 'Netflix';
+  if(lowerTitle.includes('amazon')) return 'Amazon';
+  if(lowerTitle.includes('apple')||lowerTitle.includes('itunes')) return 'Apple';
+  if(lowerTitle.includes('razer')) return 'Razer Gold';
+  if(lowerTitle.includes('binance')) return 'Binance';
+  return 'Gift Card';
+ }
+ return product.platform;
+}
+function GiftIcon(){return <svg className="platform-logo gift-platform-logo" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path fillRule="evenodd" clipRule="evenodd" d="M5.85015 11.817C5.84157 11.0126 6.14493 10.2376 6.69349 9.6626C7.24204 9.08761 7.99085 8.75968 8.77515 8.75098H14.6252C15.4095 8.75968 16.1583 9.08761 16.7068 9.6626C17.2554 10.2376 17.5587 11.0126 17.5502 11.817V16.927C17.5675 18.6017 16.258 19.9738 14.6252 19.992H8.77515C7.99085 19.9833 7.24204 19.6553 6.69349 19.0803C6.14493 18.5054 5.84157 17.7304 5.85015 16.926V11.817Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path fillRule="evenodd" clipRule="evenodd" d="M12.3719 5.837L12.7834 7.498L12.9481 8.06L13.1821 7.115C13.271 6.70798 13.5174 6.35553 13.8648 6.13864C14.2122 5.92175 14.6306 5.85907 15.0239 5.965C15.8426 6.22815 16.3123 7.10774 16.0876 7.957C15.993 8.39935 15.6236 8.72353 15.1828 8.751H9.75015C8.84861 8.70804 8.09459 8.03409 7.92982 7.124C7.583 5.82513 8.30164 4.4779 9.55515 4.077C10.1569 3.91498 10.797 4.01099 11.3283 4.34295C11.8596 4.67492 12.2363 5.21427 12.3719 5.837Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M13.6796 8.23006C13.7735 7.82664 13.5226 7.42346 13.1192 7.32953C12.7157 7.23561 12.3126 7.48651 12.2186 7.88993M12.0578 8.58093C11.9638 8.98436 12.2147 9.38754 12.6182 9.48146C13.0216 9.57539 13.4248 9.32448 13.5187 8.92106M12.4501 8.751C12.4501 8.33678 12.1143 8.001 11.7001 8.001C11.2859 8.001 10.9501 8.33678 10.9501 8.751V19.992C10.9501 20.4062 11.2859 20.742 11.7001 20.742C12.1143 20.742 12.4501 20.4062 12.4501 19.992V8.751Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+
 export function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug:string)=>void;onAdd:(p:Product)=>void;onWish:(p:Product)=>void}){
  const [failed,setFailed]=useState(false);
- const platform=product.platform==='PC'?'Steam':product.platform==='Xbox'?'Xbox Live':product.platform==='Switch'?'Nintendo':product.platform==='Gift Card'?(product.title.toLowerCase().includes('roblox')?'Roblox':'Gift Card'):product.platform==='Windows'?'Windows Store':product.platform==='PlayStation'?'PSN':product.platform;
+ const platform=resolvePlatformLabel(product);
  const region=product.region==='EU'?'EUROPE':product.region==='US'?'UNITED STATES':product.region;
  const cashback=Math.round(product.minPriceCents*(product.cashbackPercent??0)/100);
  return <article className="eneba-card">
@@ -53,7 +85,7 @@ export function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug
     {product.coverImageUrl&&!failed?<img src={product.coverImageUrl} alt={`${product.title} cover`} loading="lazy" onError={()=>setFailed(true)}/>:<div className="eneba-fallback">{product.title}</div>}
    </button>
    <button type="button" className="eneba-wish" aria-label={`Save ${product.title} to wishlist`} onClick={()=>onWish(product)}><HeartIcon width={23} height={23}/></button>
-   {cashback>0&&<span className="cashback-badge">⊕ &nbsp;CASHBACK</span>}
+   {cashback>0&&<span className="cashback-badge"><CashbackIcon/> <span>CASHBACK</span></span>}
   </div>
   <div className="eneba-card-copy">
    <div className="eneba-platform"><PlatformMark platform={platform}/> {platform}</div>
@@ -61,20 +93,29 @@ export function Card({product,onOpen,onAdd,onWish}:{product:Product;onOpen:(slug
    <div className={`eneba-region ${['GLOBAL','EUROPE','FRANCE'].includes(region)?'region-green':'region-pink'}`}>{region}</div>
    <span className="eneba-from">From</span>
    <div className="eneba-price">{money(product.minPriceCents,product.currency)} <span className="round-info" title="Price from the cheapest seller">i</span></div>
-   <div className="eneba-cashback">{cashback>0?`Cashback: ${money(cashback,product.currency)}`:'Demo digital key'}</div>
+   <div className="eneba-cashback">{cashback>0?<><span className="cashback-inline-icon"><CashbackIcon/></span>Cashback: {money(cashback,product.currency)}</>:'Demo digital key'}</div>
    <div className="eneba-card-actions"><button type="button" className="card-add" onClick={()=>onAdd(product)}>Add to cart</button><button type="button" className="card-offers" onClick={()=>onOpen(product.slug)}>View offers</button></div>
   </div>
  </article>
 }
 function PlatformMark({platform}:{platform:string}){
  const kind=platform.toLowerCase();
- if(kind.includes('xbox'))return <svg className="platform-logo" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="currentColor"/><path d="M7 7c5 2 8 5 9 7 1-2 4-5 9-7M6 25c1-5 5-10 10-13 5 3 9 8 10 13" stroke="#161326" strokeWidth="2.8" fill="none"/></svg>;
- if(kind.includes('steam')||kind==='pc')return <svg className="platform-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2"/><circle cx="21" cy="11" r="4" stroke="currentColor" strokeWidth="2"/><path d="M5 19 13 23 19 15" stroke="currentColor" strokeWidth="2.5"/><circle cx="11" cy="23" r="3" fill="currentColor"/></svg>;
- if(kind.includes('psn')||kind.includes('playstation')||kind.includes('ps5'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M14 2c8 1 12 4 12 10 0 4-3 5-7 4V8c0-1-1-2-2-2v23l-5-2V2h2Zm-4 16v6l-8-2v-3l8-3Zm9 2 11-4v5l-11 4v-5Z"/></svg>;
+ if(kind.includes('xbox'))return <img className="platform-logo platform-logo-image" src="/shortcut-icons/xbox.svg" alt="" loading="lazy" aria-hidden="true"/>;
+ if(kind.includes('steam')||kind==='pc')return <img className="platform-logo platform-logo-image" src="/shortcut-icons/steam.svg" alt="" loading="lazy" aria-hidden="true"/>;
+ if(kind.includes('nintendo')||kind.includes('switch'))return <img className="platform-logo platform-logo-image" src="/shortcut-icons/nintendo.svg" alt="" loading="lazy" aria-hidden="true"/>;
+ if(kind.includes('psn')||kind.includes('playstation')||kind.includes('ps5'))return <img className="platform-logo platform-logo-image" src="/shortcut-icons/psn.svg" alt="" loading="lazy" aria-hidden="true"/>;
  if(kind.includes('roblox'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M9 2 30 9 23 30 2 23 9 2Zm6 9-4 6 6 4 4-6-6-4Z"/></svg>;
  if(kind.includes('windows')||kind.includes('store'))return <svg className="platform-logo" viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M2 5 15 3v12H2V5Zm16-2 12-2v14H18V3ZM2 18h13v12L2 28V18Zm16 0h12v14l-12-2V18Z"/></svg>;
+ if(kind.includes('spotify'))return <svg className="platform-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 1.75a10.25 10.25 0 1 0 0 20.5 10.25 10.25 0 0 0 0-20.5Zm4.84 14.73a.9.9 0 0 1-1.24.3c-3.4-2.08-7.68-2.55-12.73-1.4a.9.9 0 1 1-.4-1.76c5.54-1.26 10.3-.72 14.07 1.58.42.26.56.81.3 1.28Zm1.76-3.22a1.13 1.13 0 0 1-1.54.37c-3.89-2.39-9.81-3.08-14.42-1.69a1.13 1.13 0 0 1-.66-2.16c5.29-1.61 11.85-.84 16.26 1.87.53.33.7 1.02.36 1.6Zm.15-3.35C14.14 7.1 6.53 6.84 2.12 8.2a1.35 1.35 0 1 1-.79-2.59c5.07-1.55 13.5-1.25 18.82 1.9a1.35 1.35 0 0 1-1.4 2.4Z"/></svg>;
+ if(kind.includes('netflix'))return <svg className="platform-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 2h4l4.1 11.66V2H18v20l-4.02-.59L10 10.7V21.2L6 22V2Z"/></svg>;
+ if(kind.includes('amazon'))return <svg className="platform-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.58 15.56c-.92.68-2.24 1.05-3.39 1.05-1.61 0-3.05-.6-4.15-1.6-.09-.08-.01-.19.09-.13 1.19.7 2.65 1.13 4.16 1.13 1.02 0 2.14-.22 3.16-.67.16-.07.3.1.13.22Zm.38 1.34c-.12.17-.78.08-1.08.04-.1-.01-.12.07-.03.14.57.4 1.49.28 1.6.15.12-.12.31-1.02-.22-1.45-.08-.06-.15-.03-.11.06.12.3.36.9.24 1.06ZM15.4 12.6V8.95c0-.28 0-.53-.2-.73-.17-.16-.46-.22-.68-.22-.64 0-1.22.33-1.36 1.04-.03.16-.15.32-.31.33l-1.77-.19c-.15-.03-.31-.16-.27-.39.41-2.15 2.35-2.8 4.08-2.8.88 0 2.03.23 2.72.9.88.83.79 1.94.79 3.15v2.86c0 .86.36 1.23.7 1.7.12.17.14.36 0 .48-.37.31-1.02.88-1.38 1.19-.17.09-.41.1-.56-.03-.36-.3-.57-.44-.83-.83-.79.81-1.35 1.05-2.38 1.05-1.22 0-2.17-.75-2.17-2.26 0-1.18.64-1.98 1.55-2.37.79-.35 1.9-.41 2.74-.5v-.19c0-.35.03-.77-.18-1.07-.18-.27-.53-.38-.83-.38-.57 0-1.08.29-1.21.9-.03.14-.14.28-.28.29l-1.72-.19c-.14-.03-.29-.15-.25-.36.35-1.83 2-2.38 3.49-2.38.76 0 1.75.2 2.35.77.76.69.69 1.61.69 2.61Zm-2.4 1.91c.39 0 .75-.2 1.01-.52.32-.39.41-.76.41-1.36v-.24c-1.04.11-2.14.22-2.14 1.27 0 .53.27.85.72.85Z"/></svg>;
+ if(kind.includes('apple'))return <svg className="platform-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M15.76 1.75c.08.89-.24 1.76-.75 2.41-.57.74-1.46 1.33-2.37 1.25-.12-.86.27-1.78.78-2.38.57-.68 1.53-1.22 2.34-1.28ZM19.8 16.85c-.47 1.08-.69 1.56-1.3 2.55-.84 1.36-2.02 3.05-3.48 3.07-1.3.02-1.64-.84-3.4-.83-1.76.01-2.13.85-3.43.83-1.45-.02-2.56-1.55-3.4-2.9-2.35-3.82-2.6-8.29-1.15-10.53 1.03-1.6 2.66-2.53 4.2-2.53 1.57 0 2.56.86 3.86.86 1.26 0 2.03-.86 3.85-.86 1.37 0 2.82.75 3.85 2.05-3.38 1.85-2.83 6.62.4 8.29Z"/></svg>;
+ if(kind.includes('razer'))return <svg className="platform-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M10.2 2.3c1.2-.12 2.45.47 3.12 1.5.6.9.7 2.06.32 3.07l.12.08c1.36-.36 2.9-.04 3.9.96 1.33 1.33 1.42 3.43.28 4.88-.83 1.07-2.2 1.6-3.54 1.4l-.06.16c.99.63 1.64 1.75 1.64 2.98A3.77 3.77 0 0 1 12.2 21a3.7 3.7 0 0 1-2.8-1.27A3.75 3.75 0 0 1 8.61 16l-.17-.07c-1.31.33-2.75-.05-3.71-.99a3.83 3.83 0 0 1-.36-5.09 3.83 3.83 0 0 1 3.8-1.27l.1-.11a3.76 3.76 0 0 1 1.93-6.17Z"/></svg>;
+ if(kind.includes('binance'))return <svg className="platform-logo" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2.6 2.7 2.72-2.7 2.7-2.7-2.7L12 2.6Zm-4.39 4.38 2.7 2.71-2.7 2.7-2.7-2.7 2.7-2.7ZM16.39 6.98l2.7 2.71-2.7 2.7-2.7-2.7 2.7-2.7ZM12 11.37l2.7 2.71-2.7 2.7-2.7-2.7 2.7-2.7Zm-4.39 4.39 2.7 2.7L12 20.2l1.69-1.74 2.7-2.7-2.7-2.7L12 14.76l-1.69-1.7-2.7 2.7Z"/></svg>;
+ if(kind.includes('gift'))return <GiftIcon/>;
  return <svg className="platform-logo" viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="4" y="4" width="24" height="24" rx="5" stroke="currentColor" strokeWidth="2"/><path d="M16 6v20" stroke="currentColor" strokeWidth="2"/></svg>
 }
+
 function GiftCardTile({product,onOpen}:{product:Product;onOpen:(slug:string)=>void}){
  const [failed,setFailed]=useState(false);
  return <button className="egift-tile" type="button" onClick={()=>onOpen(product.slug)} aria-label={`View ${product.title}`} style={{backgroundColor:product.coverColor}}>{product.coverImageUrl&&!failed?<img src={product.coverImageUrl} alt={product.title} loading="lazy" onError={()=>setFailed(true)}/>:<strong>{product.title}</strong>}</button>;
