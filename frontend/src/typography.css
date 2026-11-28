@@ -1,10 +1,10 @@
+
 /* Free, OFL-licensed typographic stand-ins for Eneba's commercial typefaces.
    Kind Sans Medium      -> Rubik 500
    Core Sans C 75 Extra Bold -> Archivo 900
    Aftika Semi Bold      -> Manrope 600
    Radian Extra Bold     -> Plus Jakarta Sans 800
-   We intentionally do not distribute the original commercial font files.
-*/
+   We intentionally do not distribute the original commercial font files. */
 :root {
   --font-ui: 'Plus Jakarta Sans', Arial, sans-serif;
   --font-category: 'Rubik', Arial, sans-serif;
@@ -13,15 +13,27 @@
   --font-product: 'Plus Jakarta Sans', Arial, sans-serif;
   font-family: var(--font-ui);
 }
-body, button, input, select, textarea { font-family: var(--font-ui); }
+body, button, input, select, textarea {
+  font-family: var(--font-ui);
+}
 /* Homepage category shortcuts and category cards */
 .shortcut, .shortcut > span:last-child, .genre-card, .genre-card strong,
-.nav-links button { font-family: var(--font-category); }
-.shortcut, .genre-card strong { font-weight: 500; }
+.nav-links button {
+  font-family: var(--font-category);
+}
+.shortcut, .genre-card strong {
+  font-weight: 500;
+}
 /* Large/heavy search placeholder; keep regular input text legible */
-.search-wrap input::placeholder { font-family: var(--font-display); font-weight: 900; }
+.search-wrap input::placeholder {
+  font-family: var(--font-display);
+  font-weight: 900;
+}
 /* Language / currency selector */
-.locale { font-family: var(--font-locale); font-weight: 600; }
+.locale {
+  font-family: var(--font-locale);
+  font-weight: 600;
+}
 /* Game names, currency, merchandising headlines and actions */
 .eneba-title, .eneba-price, .home-shelf-heading,
 .product-details h3, .price, .offer-price, .popover-total,
@@ -33,6 +45,11 @@ body, button, input, select, textarea { font-family: var(--font-ui); }
 }
 /* Smaller information / meta text needs less weight than titles */
 .eneba-region, .eneba-from, .eneba-cashback, .price-from,
-.home-shelf-subtitle, .genre-count { font-family: var(--font-ui); }
+.home-shelf-subtitle, .genre-count {
+  font-family: var(--font-ui);
+}
 /* Preserve circular i geometry from the previous patch. */
-.round-info { font-family: Arial, sans-serif; }
+.round-info {
+  font-family: Arial, sans-serif;
+}
+

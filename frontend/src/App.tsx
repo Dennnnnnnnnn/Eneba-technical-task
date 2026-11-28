@@ -1,143 +1,931 @@
 import ProductDetail from './ProductDetail';
-import Homepage,{Card as ProductCard} from './Homepage';
-import {HeartIcon,CartIcon} from './UiIcons';
-import {useEffect,useState} from 'react';
-import {fetchOffers,fetchProduct,fetchProducts,currentAccount,register,login,logout,getCart,addCartItem,removeCartItem,checkout,getOrders,getOrder,type Account,type Cart,type Order,type Filters,type Offer,type Product,type ProductPage} from './api';
+import Homepage, { Card as ProductCard } from './Homepage';
+import { HeartIcon, CartIcon } from './UiIcons';
+import { useEffect, useState } from 'react';
+import { fetchOffers, fetchProduct, fetchProducts, currentAccount, register, login, logout, getCart, addCartItem, removeCartItem, checkout, getOrders, getOrder, type Account, type Cart, type Order, type Filters, type Offer, type Product, type ProductPage } from './api';
 
-function euro(cents:number,currency='EUR'){return new Intl.NumberFormat('en-IE',{style:'currency',currency}).format(cents/100)}
-const DEFAULT:Filters={q:'',platform:'',region:'',sort:'name_asc',page:1,pageSize:12};
-type View='home'|'store'|'product'|'cart'|'orders'|'order';
-function localeFlagSrc(region:string){
- switch(region){
-  case 'United Kingdom': return 'https://static.eneba.games/flags/lang/v2/united_kingdom.svg';
-  case 'United States': return 'https://static.eneba.games/flags/lang/v2/united_states.svg';
-  case 'Germany': return 'https://static.eneba.games/flags/lang/v2/germany.svg';
-  case 'Lithuania':
-  default: return 'https://static.eneba.games/flags/lang/v2/lithuania.svg';
- }
+/** Format database prices (stored as integer cents) for display. */
+function euro(cents: number, currency = 'EUR') {
+  return new Intl.NumberFormat('en-IE', { style: 'currency', currency }).format(cents / 100);
 }
-export default function App(){
- const [view,setView]=useState<View>('home');
- const [account,setAccount]=useState<Account|null>(null);
- const [authOpen,setAuthOpen]=useState(false);const [authMode,setAuthMode]=useState<'login'|'register'>('login');
- const [email,setEmail]=useState('');const [password,setPassword]=useState('');const [authError,setAuthError]=useState('');const [authBusy,setAuthBusy]=useState(false);
- const [cartDropdown,setCartDropdown]=useState(false);const [cart,setCart]=useState<Cart|null>(null);const [cartBusy,setCartBusy]=useState(false);const [cartError,setCartError]=useState('');const [,setSelectedOfferId]=useState<number|null>(null);const [pendingOfferId,setPendingOfferId]=useState<number|null>(null);
- const [orders,setOrders]=useState<Order[]>([]);const [selectedOrder,setSelectedOrder]=useState<Order|null>(null);const [orderID,setOrderID]=useState(0);
- const [paymentBusy,setPaymentBusy]=useState(false);const [checkoutKey,setCheckoutKey]=useState<string|null>(null);
- const [notice,setNotice]=useState('');
- // Every new notification automatically expires; a newer message resets the timer.
- useEffect(()=>{if(!notice)return;const timer=window.setTimeout(()=>setNotice(''),4000);return()=>window.clearTimeout(timer)},[notice]);
- const [localeOpen,setLocaleOpen]=useState(false);
- const [demoSupport,setDemoSupport]=useState<number|null>(null);
- const [supportExpanded,setSupportExpanded]=useState(true);
- const [suggestions,setSuggestions]=useState<Product[]>([]);
- const [suggestionLoading,setSuggestionLoading]=useState(false);
- const [localePreferences,setLocalePreferences]=useState<{region:string;language:string;currency:string}>(()=>{
-  try{const stored=JSON.parse(localStorage.getItem('eneba-demo-locale')||'null');if(stored&&typeof stored.region==='string'&&typeof stored.language==='string'&&typeof stored.currency==='string')return stored}catch{}
-  return {region:'Lithuania',language:'English EU',currency:'EUR'};
- });
- const [localeDraft,setLocaleDraft]=useState(localePreferences);
- useEffect(()=>{if(!localeOpen)return;const onKey=(event:KeyboardEvent)=>{if(event.key==='Escape')setLocaleOpen(false)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[localeOpen]);
- function openLocale(){setLocaleDraft(localePreferences);setLocaleOpen(true)}
- function saveLocale(){setLocalePreferences(localeDraft);localStorage.setItem('eneba-demo-locale',JSON.stringify(localeDraft));setLocaleOpen(false);setNotice('Preferences saved for this browser. Catalog prices remain in EUR in this demo.')}
- useEffect(()=>{if(!cartDropdown)return;const onKey=(event:KeyboardEvent)=>{if(event.key==='Escape')setCartDropdown(false)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[cartDropdown]);
- const [filters,setFilters]=useState<Filters>(DEFAULT);const [minInput,setMinInput]=useState('');const [maxInput,setMaxInput]=useState('');
- const [results,setResults]=useState<ProductPage|null>(null);const [loading,setLoading]=useState(false);const [error,setError]=useState('');
- const [slug,setSlug]=useState('');const [product,setProduct]=useState<Product|null>(null);const [offers,setOffers]=useState<Offer[]>([]);const [detailLoading,setDetailLoading]=useState(false);const [detailError,setDetailError]=useState('');
- function navigate(next:View,productSlug=''){
-  setCartDropdown(false);setView(next);setSlug(productSlug);if(next==='product')setSelectedOfferId(null);
-  const path=next==='home'?'/':next==='store'?'/store':next==='cart'?'/cart':next==='orders'?'/orders':next==='order'?`/orders/${productSlug}`:`/products/${encodeURIComponent(productSlug)}`;
-  window.history.pushState({},'',path);window.scrollTo({top:0,behavior:'smooth'});
- }
- function applyLocation(){const p=window.location.pathname;if(p.startsWith('/orders/')){setOrderID(Number(p.slice('/orders/'.length)));setView('order')}else if(p==='/orders'){setView('orders')}else if(p==='/cart'){setView('cart')}else if(p.startsWith('/products/')){setSlug(decodeURIComponent(p.slice('/products/'.length)));setView('product')}else if(p==='/store'){setView('store')}else setView('home')}
- useEffect(()=>{applyLocation();window.addEventListener('popstate',applyLocation);return()=>window.removeEventListener('popstate',applyLocation)},[]);
- const store=()=>navigate('store');const homeView=()=>navigate('home');const openProduct=(s:string)=>{
-  try{const old=JSON.parse(localStorage.getItem('eneba-demo-recently-viewed')||'[]');const list=Array.isArray(old)?old.filter(x=>typeof x==='string'&&x!==s):[];localStorage.setItem('eneba-demo-recently-viewed',JSON.stringify([s,...list].slice(0,12)))}catch{}
-  navigate('product',s);
- };
- useEffect(()=>{currentAccount().then(a=>{setAccount(a);getCart().then(setCart).catch(()=>{})}).catch(()=>{})},[]);
- useEffect(()=>{if(!account)return;if(view==='cart')getCart().then(setCart).catch(e=>setCartError(String(e)));
- if(view==='orders')getOrders().then(setOrders).catch(e=>setCartError(String(e)));
- if(view==='order'&&orderID)getOrder(orderID).then(setSelectedOrder).catch(e=>setCartError(String(e)));
- },[view,account,orderID]);
- function openAuth(mode:'login'|'register'='login'){setAuthMode(mode);setAuthError('');setAuthOpen(true)}
- async function submitAuth(e:React.FormEvent){e.preventDefault();setAuthBusy(true);setAuthError('');try{const a=authMode==='login'?await login(email,password):await register(email,password);setAccount(a);setAuthOpen(false);setPassword('');setNotice(`Welcome, ${a.email}`);if(pendingOfferId!==null){const chosen=pendingOfferId;setPendingOfferId(null);setCartBusy(true);try{setCart(await addCartItem(chosen));setCartDropdown(true);setNotice('Offer added to your cart')}catch(error){setCartError(error instanceof Error?error.message:String(error));navigate('cart')}finally{setCartBusy(false)}}else{getCart().then(setCart).catch(error=>setCartError(String(error))) }}catch(err){setAuthError(String(err instanceof Error?err.message:err))}finally{setAuthBusy(false)}}
- async function signOut(){try{await logout();setAccount(null);setCart(null);setOrders([]);navigate('home');setNotice('Signed out')}catch(e){setNotice(String(e))}}
- async function addOffer(id:number){if(!account){setPendingOfferId(id);openAuth('login');setNotice('Sign in to finish adding this offer');return}setCartBusy(true);setCartError('');try{const c=await addCartItem(id);setCart(c);setNotice('Added to cart');setCartDropdown(true)}catch(e){setCartError(String(e));setNotice('Could not add offer: '+(e instanceof Error?e.message:String(e)))}finally{setCartBusy(false)}}
- async function removeOffer(id:number){setCartBusy(true);try{setCart(await removeCartItem(id))}catch(e){setCartError(String(e))}finally{setCartBusy(false)}}
- async function pay(){if(!account||!cart?.items.length)return;setPaymentBusy(true);setCartError('');const key=checkoutKey??crypto.randomUUID();setCheckoutKey(key);try{const receipt=await checkout(key);setCheckoutKey(null);setCart({items:[],totalCents:0,currency:'EUR'});setSelectedOrder(receipt);setOrderID(receipt.id);navigate('order',String(receipt.id));setNotice('Demo payment successful. Your keys are ready.')}catch(e){setCartError(String(e))}finally{setPaymentBusy(false)}}
- useEffect(()=>{
-  if(view!=='cart'||!account||!cart?.items.length){setSuggestions([]);return}
-  const controller=new AbortController();setSuggestionLoading(true);
-  fetchProducts({...DEFAULT,pageSize:24,sort:'name_asc'},controller.signal)
-    .then(page=>setSuggestions(page.items.filter(p=>!cart.items.some(item=>item.slug===p.slug)).slice(0,5)))
-    .catch(()=>{if(!controller.signal.aborted)setSuggestions([])})
-    .finally(()=>{if(!controller.signal.aborted)setSuggestionLoading(false)});
-  return()=>controller.abort();
- },[view,account,cart?.items.map(item=>item.slug).join('|')]);
- const update=(next:Partial<Filters>)=>setFilters(f=>({...f,...next,page:next.page??1}));
- useEffect(()=>{
-  if(view!=='store')return;
-  const c=new AbortController();setLoading(true);setError('');
-  const timer=window.setTimeout(()=>fetchProducts(filters,c.signal).then(setResults).catch(e=>{if(!c.signal.aborted)setError(String(e))}).finally(()=>{if(!c.signal.aborted)setLoading(false)}),180);
-  return()=>{window.clearTimeout(timer);c.abort()};
- },[view,filters]);
- useEffect(()=>{
-  if(view!=='product'||!slug)return;
-  const c=new AbortController();setProduct(null);setOffers([]);setCartError('');setSelectedOfferId(null);setDetailError('');setDetailLoading(true);
-  Promise.all([fetchProduct(slug,c.signal),fetchOffers(slug,c.signal)]).then(([p,o])=>{setProduct(p);setOffers(o);try{const old=JSON.parse(localStorage.getItem('eneba-demo-recently-viewed')||'[]');const list=Array.isArray(old)?old.filter(x=>typeof x==='string'&&x!==p.slug):[];localStorage.setItem('eneba-demo-recently-viewed',JSON.stringify([p.slug,...list].slice(0,12)))}catch{}}).catch(e=>{if(!c.signal.aborted)setDetailError(String(e))}).finally(()=>{if(!c.signal.aborted)setDetailLoading(false)});
-  return()=>c.abort();
- },[view,slug]);
- const applyPrices=()=>{const minimum=minInput.trim()===''?undefined:Math.round(Number(minInput)*100),maximum=maxInput.trim()===''?undefined:Math.round(Number(maxInput)*100);
-  if((minimum!==undefined&&(!Number.isFinite(minimum)||minimum<0))||(maximum!==undefined&&(!Number.isFinite(maximum)||maximum<0))||(minimum!==undefined&&maximum!==undefined&&minimum>maximum)){setError('Enter valid prices: minimum must not exceed maximum.');return}
-  setError('');update({minPriceCents:minimum,maxPriceCents:maximum});};
- const clear=()=>{setFilters(DEFAULT);setMinInput('');setMaxInput('');setError('')};
- return <div className="site-shell">{view==='cart'?<header className="checkout-header"><div className="container checkout-header-inner"><button className="brand eneba-brand" onClick={homeView} aria-label="Return to homepage"><img src="https://static.eneba.games/branding/v2/logoFull.svg" alt="Eneba logo" width="152" height="48"/></button><nav className="checkout-steps" aria-label="Checkout progress"><span className="step-current"><b>1</b> Cart</span><i/><span><b>2</b> Payment</span><i/><span><b>3</b> Get your product</span></nav><button className="locale" type="button" onClick={openLocale}><img className="locale-flag locale-flag-image" src={localeFlagSrc(localePreferences.region)} alt={`${localePreferences.region} flag`} width={16} height={16}/> {localePreferences.language} | {localePreferences.currency}</button></div></header>:<header className="site-header"><div className="topbar container">
-  <button className="brand eneba-brand" onClick={homeView} aria-label="Eneba demo home"><img src="https://static.eneba.games/branding/v2/logoFull.svg" alt="Eneba logo" width="160" height="50" decoding="async"/></button>
-  <label className="search-wrap"><span className="search-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="7.3"/><path d="m16.3 16.3 5.1 5.1"/></svg></span><input placeholder="Search for games, top-ups and more" aria-label="Search for products" value={filters.q} onChange={e=>{const q=e.target.value;setFilters({...DEFAULT,q,sort:q.trim()?'relevance':'name_asc'});setMinInput('');setMaxInput('');setResults(null);setError('');if(q.trim()&&view!=='store')navigate('store')}} onKeyDown={e=>{if(e.key==='Enter')store()}}/></label>
-  <button className="locale" type="button" title="Change region, language and currency" onClick={openLocale}><img className="locale-flag locale-flag-image" src={localeFlagSrc(localePreferences.region)} alt={`${localePreferences.region} flag`} width={16} height={16}/> {localePreferences.language} | {localePreferences.currency}</button>
- <button className="top-icon heart-header" title="Wishlist (demo)" onClick={()=>setNotice('Wishlist is not part of this internship demo yet')} aria-label="Wishlist"><HeartIcon width={27} height={27}/></button>
- <div className="cart-control"><button className="top-icon cart-icon" aria-haspopup="dialog" aria-expanded={cartDropdown} onClick={()=>{setCartError('');setCartDropdown(v=>!v);if(account)getCart().then(setCart).catch(e=>setCartError(String(e)))}} aria-label="Open shopping cart"><CartIcon className="header-cart-svg" width={29} height={29}/>{Boolean(cart?.items.length)&&<span className="cart-count">{cart?.items.length}</span>}</button></div>
- <div className="user-menu"><button className="avatar-button" aria-label={account?'Account menu':'Sign in'} title={account?.email??'Log in / register'} onClick={()=>account?navigate('orders'):openAuth('login')}>♙</button>{account&&<button className="logout-compact" onClick={signOut}>Log out</button>}</div> </div><div className="nav-band"><nav className="container nav-links" aria-label="Main navigation"><button onClick={store}>☰ &nbsp; Categories</button><button onClick={store}>Cheap Games</button><button onClick={store}>Software</button><button onClick={store}>eGift Cards</button><button onClick={store}>Eneba Gift Cards</button><button onClick={store}>Giveaway</button><button onClick={store}>GTA <img className="gta-menu-vi" src="https://static.eneba.games/0df22079f978caa1f11a.png" alt="VI" decoding="async"/></button><button className="special-link black-week" onClick={store}>BLACK WEEK</button></nav></div></header>}
- {localeOpen&&<div className="locale-overlay" onMouseDown={e=>{if(e.target===e.currentTarget)setLocaleOpen(false)}}>
-  <section className="locale-dialog" role="dialog" aria-modal="true" aria-labelledby="locale-title">
-   <button type="button" className="locale-close" onClick={()=>setLocaleOpen(false)} aria-label="Close settings">×</button>
-   <h2 id="locale-title">Update your settings</h2><p>Set your preferred region, language, and the currency.</p>
-   <label>Region<select value={localeDraft.region} onChange={e=>setLocaleDraft(v=>({...v,region:e.target.value}))}><option value="Lithuania">🇱🇹 Lithuania</option><option value="Germany">🇩🇪 Germany</option><option value="United Kingdom">🇬🇧 United Kingdom</option><option value="United States">🇺🇸 United States</option></select></label>
-   <label>Language<select value={localeDraft.language} onChange={e=>setLocaleDraft(v=>({...v,language:e.target.value}))}><option value="English EU">English EU</option><option value="English US">English US</option><option value="English UK">English UK</option></select></label>
-   <label>Currency<select value={localeDraft.currency} onChange={e=>setLocaleDraft(v=>({...v,currency:e.target.value}))}><option value="EUR">Euro (€)</option><option value="USD">US Dollar ($)</option><option value="GBP">Pound Sterling (£)</option></select></label>
-   <p className="locale-note">Display preferences only; demo checkout remains in EUR and the interface is currently in English.</p>
-   <div className="locale-actions"><button type="button" className="locale-cancel" onClick={()=>setLocaleOpen(false)}>Cancel</button><button type="button" className="locale-save" onClick={saveLocale}>Save</button></div>
-  </section>
- </div>}
- {cartDropdown&&<><button className="cart-popover-scrim" type="button" aria-label="Close shopping cart" onClick={()=>setCartDropdown(false)}/><section className="cart-popover" role="dialog" aria-label="My shopping cart"><div className="cart-popover-header"><h2>My shopping cart</h2><button type="button" aria-label="Close shopping cart" onClick={()=>setCartDropdown(false)}>×</button></div>{cartError&&<p className="cart-popover-error" role="alert">{cartError}</p>}{!account?<div className="cart-popover-empty"><div className="empty-info-icon">i</div><h3>Sign in to view your cart</h3><p>Choose products and sign in to continue.</p><button className="yellow-button" onClick={()=>{setCartDropdown(false);openAuth('login')}}>Sign in</button></div>:!cart?.items.length?<div className="cart-popover-empty"><div className="empty-info-icon">i</div><h3>Your shopping cart is empty</h3><p>It seems you haven't chosen your products yet</p></div>:<><div className="cart-popover-items">{cart.items.map(item=><div className="cart-popover-item" key={item.offerId}><div className="cart-popover-thumb">{item.coverImageUrl&&<img src={item.coverImageUrl} alt=""/>}</div><div className="cart-popover-info"><div className="popover-seller">🎮 &nbsp; {item.seller}</div><strong>{item.title} ({item.platform}) Key {item.region}</strong><small>Digital product ⓘ</small><div className="popover-item-bottom"><span className="popover-quantity"><button type="button" title="Remove offer" disabled={cartBusy} onClick={()=>removeOffer(item.offerId)}>−</button> 1 <button type="button" title="One key per offer in this demo" disabled>+</button></span><b>{euro(item.priceCents,item.currency)}</b></div><span className="popover-cashback">Cashback: {euro(Math.round(item.priceCents*item.cashbackPercent/100),item.currency)} <small>(illustrative)</small></span></div><button className="popover-remove" type="button" aria-label={`Remove ${item.title}`} disabled={cartBusy} onClick={()=>removeOffer(item.offerId)}><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg></button></div>)}</div><div className="cart-popover-summary"><div className="popover-fee">Service fee: <span>— ⓘ</span></div><div className="popover-total">Total <strong>{euro(cart.totalCents,cart.currency)}</strong></div><span className="popover-cashback-total">Demo cashback: {euro(cart.items.reduce((sum,item)=>sum+Math.round(item.priceCents*item.cashbackPercent/100),0),cart.currency)}</span><button className="cart-popover-primary" type="button" onClick={()=>navigate('cart')}>View cart</button><button className="cart-popover-secondary" type="button" onClick={()=>navigate('cart')}>Checkout now</button><p>Simulated checkout · no real money charged</p></div></>}</section></>}
- {notice&&<div className={`toast toast-floating ${/^(Could not|Error|Failed|\bError:)/i.test(notice)?'toast-error':'toast-success'}`} role="status" aria-live="polite">{notice}<button aria-label="Dismiss notification" onClick={()=>setNotice('')}>×</button></div>}
- {view==='home'?<Homepage onBrowse={store} onOpen={openProduct} onAdd={p=>{fetchOffers(p.slug).then(available=>{if(available.length)addOffer(available[0].id);else setNotice('No seller offers are available for this product.')}).catch(e=>setNotice(`Could not find a seller offer: ${String(e)}`))}} onWish={p=>setNotice(`${p.title}: wishlist is not available in this demo yet`)}/>
- :view==='store'?<main className="container store-view"><div className="breadcrumb"><button onClick={homeView}>Home</button><span>›</span>Games</div><div className="store-head"><h1>Games</h1><p>Explore offers from different sellers. Search even with incomplete names or typos.</p></div>
- <div className="store-layout"><aside className="filter-panel"><h2>Filters</h2><label>Platform<select value={filters.platform} onChange={e=>update({platform:e.target.value})}><option value="">All platforms</option><option value="PC">PC</option><option value="Xbox">Xbox</option><option value="Switch">Switch</option></select></label>
- <label>Region<select value={filters.region} onChange={e=>update({region:e.target.value})}><option value="">All regions</option><option value="GLOBAL">Global</option><option value="EU">Europe</option><option value="US">United States</option></select></label>
- <label>Minimum price (€)<input type="number" min="0" step="0.01" placeholder="0.00" value={minInput} onChange={e=>setMinInput(e.target.value)}/></label>
- <label>Maximum price (€)<input type="number" min="0" step="0.01" placeholder="50.00" value={maxInput} onChange={e=>setMaxInput(e.target.value)}/></label>
- <button className="apply-button" onClick={applyPrices}>Apply price</button><button className="clear-button" onClick={clear}>Clear filters</button></aside>
- <div className="store-results"><div className="results-header"><span>{loading?'Loading…':`${results?.total??0} games found`}</span><label>Sort by <select value={filters.sort} onChange={e=>update({sort:e.target.value})}><option value="name_asc">Name A–Z</option><option value="name_desc">Name Z–A</option><option value="price_asc">Price low to high</option><option value="price_desc">Price high to low</option><option value="relevance">Best match</option></select></label></div>
- {error?<div className="notice error">{error}</div>:loading?<div className="notice">Loading games from PostgreSQL…</div>:!results?.items?.length?<div className="notice">No games found for {filters.q.trim()?`“${filters.q.trim()}”`:'these filters'}. <button className="clear-button" onClick={clear}>Clear search and filters</button></div>:<><div className="cards-grid">{(results?.items ?? []).map(p=><ProductCard key={p.id} product={p} onOpen={openProduct} onAdd={item=>{fetchOffers(item.slug).then(available=>{if(available.length)addOffer(available[0].id);else setNotice('No offers available')}).catch(e=>setNotice(String(e)))}} onWish={item=>setNotice(`${item.title}: wishlist is not implemented in this demo`)}/>)}</div><nav className="pagination" aria-label="Catalog pagination"><button disabled={filters.page<=1} onClick={()=>update({page:filters.page-1})}>← Previous</button><span>Page {results.page} of {Math.max(1,results.totalPages)}</span><button disabled={filters.page>=results.totalPages} onClick={()=>update({page:filters.page+1})}>Next →</button></nav></>}
- </div></div></main>:view==='product'?<main className="container product-view"><div className="breadcrumb"><button onClick={homeView}>Home</button><span>›</span><button onClick={store}>Games</button><span>›</span>{product?.title||slug}</div>
- {detailLoading?<div className="notice">Loading product and seller offers…</div>:detailError?<div className="notice error">{detailError}</div>:product?<ProductDetail product={product} offers={offers} busy={cartBusy} error={cartError} onAdd={addOffer} onCart={()=>navigate('cart')} onSignIn={()=>openAuth('login')} authenticated={Boolean(account)} onNotice={setNotice}/>:null}</main>:null}
- {view==='cart'&&<main className="container commerce-page checkout-page"><h1 className="checkout-page-title">My cart</h1>{cartError&&<p role="alert" className="form-error">{cartError}</p>}{!account?<div className="notice">Your cart is available after you sign in. <button onClick={()=>openAuth('login')}>Log in</button> or <button onClick={()=>openAuth('register')}>create an account</button>.</div>:<><div className="checkout-layout"><div className="checkout-left"><section className="commerce-panel checkout-items-panel"><h2>My cart</h2>{!cart?<div className="notice">Loading cart…</div>:cart.items.length===0?<div className="empty-state"><h2>Your shopping cart is empty</h2><p>Choose a seller offer to get started.</p><button className="yellow-button" onClick={store}>Browse games</button></div>:cart.items.map(item=><div className="cart-row checkout-item" key={item.offerId}><button className="cart-thumb checkout-thumb" onClick={()=>openProduct(item.slug)} aria-label={`View ${item.title}`}>{item.coverImageUrl&&<img src={item.coverImageUrl} alt=""/>}</button><div className="cart-info"><small className="checkout-seller">Sold by <strong>{item.seller}</strong></small><h3>{item.title} ({item.platform}) Key {item.region}</h3><p>Digital product ⓘ</p><span className="checkout-quantity">− &nbsp; 1 &nbsp; + <small>(one key per offer)</small></span><span className="checkout-item-cashback">Demo cashback: {euro(Math.round(item.priceCents*item.cashbackPercent/100),item.currency)}</span>{!item.available&&<span className="stock-warning">Offer no longer available</span>}</div><div className="checkout-item-end"><button className="checkout-wish" onClick={()=>setNotice('Wishlist is not available in this demo')} aria-label="Wishlist"><HeartIcon width={19} height={19}/></button><button className="checkout-remove" onClick={()=>removeOffer(item.offerId)} disabled={cartBusy} aria-label="Remove product">×</button><strong>{euro(item.priceCents,item.currency)}</strong></div></div>)}</section><section className="support-panel"><button type="button" className="support-heading" onClick={()=>setSupportExpanded(v=>!v)} aria-expanded={supportExpanded}><span>💙 &nbsp; Let's support freedom <small>ⓘ</small></span><span>{supportExpanded?'⌃':'⌄'}</span></button>{supportExpanded&&<div className="support-content"><p>Choose an optional demonstration pledge in support of humanitarian relief in Ukraine. No donation or payment is collected.</p><div className="support-amounts">{[50,100,200,500,1000].map(amount=><button key={amount} className={demoSupport===amount?'chosen':''} onClick={()=>setDemoSupport(old=>old===amount?null:amount)} type="button">{euro(amount)}</button>)}</div>{demoSupport!==null&&<p className="support-note">Selected: {euro(demoSupport)} — for display only, not included in your total.</p>}</div>}</section></div><aside className="summary-panel checkout-summary"><h2>Summary</h2><button className="yellow-button full" onClick={pay} disabled={paymentBusy||!cart?.items.length||cart.items.some(i=>!i.available)}>{paymentBusy?'Processing…':'Proceed to checkout'}</button><div className="summary-line"><span>{cart?.items.length??0} product(s)</span><b>{euro(cart?.totalCents??0)}</b></div><div className="summary-line"><span>Service fee ⓘ</span><span>—</span></div><div className="summary-line total"><strong>Total:</strong><b>{euro(cart?.totalCents??0)}</b></div><div className="checkout-cashback">Demo cashback: {euro((cart?.items??[]).reduce((sum,item)=>sum+Math.round(item.priceCents*item.cashbackPercent/100),0))}</div><label className="checkout-consent"><input type="checkbox"/> Send optional invitation to review my experience (demo only)</label><details className="discount-demo"><summary>Got discount code?</summary><p>Discount codes are not available in this demo.</p></details><p className="checkout-disclaimer">Simulated payment only. No real charges, donations, or emails.</p></aside></div>{cart?.items.length? <section className="inspired-section"><h2>Inspired by your picks <span className="round-info">i</span></h2>{suggestionLoading?<p>Loading suggestions…</p>:suggestions.length?<div className="inspired-grid">{suggestions.map(p=><ProductCard key={p.id} product={p} onOpen={openProduct} onAdd={item=>fetchOffers(item.slug).then(offers=>offers.length?addOffer(offers[0].id):setNotice('No seller offers available')).catch(e=>setNotice(String(e)))} onWish={item=>setNotice(`${item.title}: wishlist is not implemented`)}/>)}</div>:<p>More suggestions will appear when other products are available.</p>}</section>:null}</>}</main>}
- {view==='orders'&&<main className="container commerce-page"><div className="breadcrumb"><button onClick={homeView}>Home</button><span>›</span>Orders</div><h1>My orders</h1>{cartError&&<p className="form-error">{cartError}</p>}{orders.length===0?<div className="empty-state"><h2>No orders yet</h2><p>Your purchased digital keys will appear here.</p><button className="yellow-button" onClick={store}>Browse games</button></div>:<div className="order-list">{orders.map(o=><button key={o.id} className="order-list-row" onClick={()=>{setOrderID(o.id);setSelectedOrder(null);navigate('order',String(o.id))}}><span><strong>Order #{o.id}</strong><small>{new Date(o.createdAt).toLocaleString()}</small></span><span className="paid-label">Paid · Demo</span><strong>{euro(o.totalCents,o.currency)} →</strong></button>)}</div>}</main>}
- {view==='order'&&<main className="container commerce-page"><div className="breadcrumb"><button onClick={()=>navigate('orders')}>My orders</button><span>›</span>Order #{orderID}</div>{!selectedOrder||selectedOrder.id!==orderID?<div className="notice">Loading your order… {cartError}</div>:<><div className="order-success"><span>✓</span><div><h1>Payment simulated successfully!</h1><p>Order #{selectedOrder.id} · {new Date(selectedOrder.createdAt).toLocaleString()}</p><p>No real payment was processed. These are demonstration keys.</p></div></div><section className="commerce-panel"><h2>Your digital keys</h2>{selectedOrder.items?.map(i=><div className="delivered-item" key={i.id}><div><h3>{i.title}</h3><p>{i.platform} · {i.region} · {i.seller}</p><strong>{euro(i.priceCents,i.currency)}</strong></div><div className="key-box"><span>DEMO DIGITAL KEY</span><code>{i.key}</code><button onClick={()=>navigator.clipboard.writeText(i.key).then(()=>setNotice('Key copied')).catch(()=>setNotice('Unable to copy key'))}>Copy key</button></div></div>)}</section><button className="subtle-button" onClick={()=>navigate('orders')}>← Back to orders</button></>}</main>}
- {authOpen&&<div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setAuthOpen(false)}}><section className="auth-modal" role="dialog" aria-modal="true" aria-label={authMode==='login'?'Log in':'Register'}><button className="modal-close" onClick={()=>setAuthOpen(false)} aria-label="Close">×</button><div className="auth-heading"><span className="auth-emblem">✦</span><h2>{authMode==='login'?'Welcome back':'Create your account'}</h2><p>{authMode==='login'?'Log in to manage your games and orders.':'Join our Eneba-inspired demo to discover great game offers.'}</p></div><div className="auth-tabs"><button className={authMode==='login'?'active':''} onClick={()=>{setAuthMode('login');setAuthError('')}}>Log in</button><button className={authMode==='register'?'active':''} onClick={()=>{setAuthMode('register');setAuthError('')}}>Register</button></div><form onSubmit={submitAuth} className="auth-form"><label>Email address<input autoComplete="email" type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" required/></label><label>Password<input autoComplete={authMode==='login'?'current-password':'new-password'} type="password" value={password} onChange={e=>setPassword(e.target.value)} minLength={authMode==='register'?8:undefined} required placeholder="At least 8 characters"/></label>{authError&&<p role="alert" className="form-error">{authError}</p>}<button className="yellow-button full" type="submit" disabled={authBusy}>{authBusy?'Please wait…':authMode==='login'?'Log in →':'Create account →'}</button></form><p className="auth-footnote">Educational marketplace demo · No real purchases.</p></section></div>}
- <div className="payment-strip"><div className="container payment-logos"><strong>ENEBA WALLET</strong><b>VISA</b><b>Mastercard</b><b>PayPal</b><b>Apple Pay</b><b>G Pay</b><b>Crypto</b></div></div>
- <footer className="footer eneba-footer"><div className="container">
- <div className="footer-columns">{[
- ['About Eneba','About us','Contact','Careers','Transparency'],
- ['Buy','How to buy','Collections','Discounts','Loyalty'],
- ['Help','FAQ','Activate a game','Support','Return policy'],
- ['Community','Gaming news','Giveaways','Affiliates','Events'],
- ['Business','Sell on marketplace','Advertise','Partners','Developers']
- ].map(group=><div key={group[0]} className="footer-column"><strong>{group[0]}</strong>{group.slice(1).map(item=><span key={item}>{item}</span>)}</div>)}</div>
- <div className="footer-social"><div><strong>Follow us</strong><p>f &nbsp; 𝕏 &nbsp; ◎ &nbsp; ◈ &nbsp; ●</p></div><div><strong>Download the app</strong><p>App Store &nbsp; · &nbsp; Google Play</p></div><div><strong>Customer reviews</strong><p>★★★★★ <span>Demo presentation · not a verified Trustpilot score</span></p></div></div>
- <div className="footer-newsletter"><div><strong>Get personalized game deals</strong><p>Sign up for news about our demo marketplace.</p></div><form onSubmit={e=>{e.preventDefault();setNotice('Newsletter demo: no email was saved')}}><input aria-label="Newsletter email" type="email" required placeholder="Enter your email"/><button className="yellow-button">Subscribe</button></form><span>🇪🇺 English EU | EUR</span></div>
- <div className="footer-legal">Eneba-inspired educational demo · Not affiliated with or endorsed by Eneba. No real transactions, email subscriptions or reviews.</div>
- </div></footer></div>;
+/** Initial catalog filters; changing search/sort/region triggers a fresh API request. */
+const DEFAULT: Filters = { q: '', platform: '', region: '', sort: 'name_asc', page: 1, pageSize: 12 };
+/** The app uses a small view switcher rather than a routing library. */
+type View = 'home' | 'store' | 'product' | 'cart' | 'orders' | 'order';
+function localeFlagSrc(region: string) {
+  switch (region) {
+    case 'United Kingdom': return 'https://static.eneba.games/flags/lang/v2/united_kingdom.svg';
+    case 'United States': return 'https://static.eneba.games/flags/lang/v2/united_states.svg';
+    case 'Germany': return 'https://static.eneba.games/flags/lang/v2/germany.svg';
+    case 'Lithuania':
+    default: return 'https://static.eneba.games/flags/lang/v2/lithuania.svg';
+  }
+}
+/**
+ * App is the top-level controller: it coordinates navigation, sessions, cart
+ * actions, order lookup, and which page is currently displayed.
+ *
+ * Reusable catalog and product UI live in Homepage.tsx and ProductDetail.tsx.
+ */
+export default function App() {
+  // Navigation and account state.
+  const [view, setView] = useState<View>('home');
+  const [account, setAccount] = useState<Account | null>(null);
+  const [authOpen, setAuthOpen] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [authBusy, setAuthBusy] = useState(false);
+  // Cart state is returned by Go; only the selected offer ID is queued during login.
+  const [cartDropdown, setCartDropdown] = useState(false);
+  const [cart, setCart] = useState<Cart | null>(null);
+  const [cartBusy, setCartBusy] = useState(false);
+  const [cartError, setCartError] = useState('');
+  const [, setSelectedOfferId] = useState<number | null>(null);
+  const [pendingOfferId, setPendingOfferId] = useState<number | null>(null);
+  // Order details are fetched for the authenticated buyer.
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orderID, setOrderID] = useState(0);
+  const [paymentBusy, setPaymentBusy] = useState(false);
+  const [checkoutKey, setCheckoutKey] = useState<string | null>(null);
+  // A single short-lived notification appears after important UI actions.
+  const [notice, setNotice] = useState('');
+  // Every new notification automatically expires; a newer message resets the timer.
+  useEffect(() => {
+    if (!notice) return;
+    const timer = window.setTimeout(() => setNotice(''), 4000);
+    return () => window.clearTimeout(timer);
+  }, [notice]);
+  // Browser-only language/region preferences (not live currency conversion).
+  const [localeOpen, setLocaleOpen] = useState(false);
+  const [demoSupport, setDemoSupport] = useState<number | null>(null);
+  const [supportExpanded, setSupportExpanded] = useState(true);
+  const [suggestions, setSuggestions] = useState<Product[]>([]);
+  const [suggestionLoading, setSuggestionLoading] = useState(false);
+  const [localePreferences, setLocalePreferences] = useState<{ region: string; language: string; currency: string; }>(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('eneba-demo-locale') || 'null');
+      if (stored && typeof stored.region === 'string' && typeof stored.language === 'string' && typeof stored.currency === 'string') return stored;
+    } catch { }
+    return { region: 'Lithuania', language: 'English EU', currency: 'EUR' };
+  });
+  const [localeDraft, setLocaleDraft] = useState(localePreferences);
+  useEffect(() => {
+    if (!localeOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setLocaleOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [localeOpen]);
+  function openLocale() {
+    setLocaleDraft(localePreferences);
+    setLocaleOpen(true);
+  }
+  function saveLocale() {
+    setLocalePreferences(localeDraft);
+    localStorage.setItem('eneba-demo-locale', JSON.stringify(localeDraft));
+    setLocaleOpen(false);
+    setNotice('Preferences saved for this browser. Catalog prices remain in EUR in this demo.');
+  }
+  useEffect(() => {
+    if (!cartDropdown) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setCartDropdown(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [cartDropdown]);
+  // Store list and selected product data are requested from the REST API.
+  const [filters, setFilters] = useState<Filters>(DEFAULT);
+  const [minInput, setMinInput] = useState('');
+  const [maxInput, setMaxInput] = useState('');
+  const [results, setResults] = useState<ProductPage | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [slug, setSlug] = useState('');
+  const [product, setProduct] = useState<Product | null>(null);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState('');
+  /** Update the browser address and React view together. */
+  function navigate(next: View, productSlug = '') {
+    setCartDropdown(false);
+    setView(next);
+    setSlug(productSlug);
+    if (next === 'product') setSelectedOfferId(null);
+    const path = next === 'home' ? '/' : next === 'store' ? '/store' : next === 'cart' ? '/cart' : next === 'orders' ? '/orders' : next === 'order' ? `/orders/${productSlug}` : `/products/${encodeURIComponent(productSlug)}`;
+    window.history.pushState({}, '', path);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  /** Restore the correct view on refresh and browser Back/Forward. */
+  function applyLocation() {
+    const p = window.location.pathname;
+    if (p.startsWith('/orders/')) {
+      setOrderID(Number(p.slice('/orders/'.length)));
+      setView('order');
+    } else if (p === '/orders') {
+      setView('orders');
+    } else if (p === '/cart') {
+      setView('cart');
+    } else if (p.startsWith('/products/')) {
+      setSlug(decodeURIComponent(p.slice('/products/'.length)));
+      setView('product');
+    } else if (p === '/store') {
+      setView('store');
+    } else setView('home');
+  }
+  useEffect(() => {
+    applyLocation();
+    window.addEventListener('popstate', applyLocation);
+    return () => window.removeEventListener('popstate', applyLocation);
+  }, []);
+  const store = () => navigate('store');
+  const homeView = () => navigate('home');
+  // Remember recently visited products in this browser (not in the database).
+  const openProduct = (s: string) => {
+    try {
+      const old = JSON.parse(localStorage.getItem('eneba-demo-recently-viewed') || '[]');
+      const list = Array.isArray(old) ? old.filter(x => typeof x === 'string' && x !== s) : [];
+      localStorage.setItem('eneba-demo-recently-viewed', JSON.stringify([s, ...list].slice(0, 12)));
+    } catch { }
+    navigate('product', s);
+  };
+  useEffect(() => {
+    currentAccount().then(a => {
+      setAccount(a);
+      getCart().then(setCart).catch(() => { });
+    }).catch(() => { });
+  }, []);
+  useEffect(() => {
+    if (!account) return;
+    if (view === 'cart') getCart().then(setCart).catch(e => setCartError(String(e)));
+    if (view === 'orders') getOrders().then(setOrders).catch(e => setCartError(String(e)));
+    if (view === 'order' && orderID) getOrder(orderID).then(setSelectedOrder).catch(e => setCartError(String(e)));
+  }, [view, account, orderID]);
+  /** Show the login/register modal without leaving the current page. */
+  function openAuth(mode: 'login' | 'register' = 'login') {
+    setAuthMode(mode);
+    setAuthError('');
+    setAuthOpen(true);
+  }
+  /** Authenticate, then resume adding an offer if login interrupted checkout. */
+  async function submitAuth(e: React.FormEvent) {
+    e.preventDefault();
+    setAuthBusy(true);
+    setAuthError('');
+    try {
+      const a = authMode === 'login' ? await login(email, password) : await register(email, password);
+      setAccount(a);
+      setAuthOpen(false);
+      setPassword('');
+      setNotice(`Welcome, ${a.email}`);
+      if (pendingOfferId !== null) {
+        const chosen = pendingOfferId;
+        setPendingOfferId(null);
+        setCartBusy(true);
+        try {
+          setCart(await addCartItem(chosen));
+          setCartDropdown(true);
+          setNotice('Offer added to your cart');
+        } catch (error) {
+          setCartError(error instanceof Error ? error.message : String(error));
+          navigate('cart');
+        } finally {
+          setCartBusy(false);
+        }
+      } else {
+        getCart().then(setCart).catch(error => setCartError(String(error)))
+      }
+    } catch (err) {
+      setAuthError(String(err instanceof Error ? err.message : err));
+    } finally {
+      setAuthBusy(false);
+    }
+  }
+  async function signOut() {
+    try {
+      await logout();
+      setAccount(null);
+      setCart(null);
+      setOrders([]);
+      navigate('home');
+      setNotice('Signed out');
+    } catch (e) {
+      setNotice(String(e));
+    }
+  }
+  /** Add a specific seller offer, never just a generic product ID. */
+  async function addOffer(id: number) {
+    if (!account) {
+      setPendingOfferId(id);
+      openAuth('login');
+      setNotice('Sign in to finish adding this offer');
+      return;
+    }
+    setCartBusy(true);
+    setCartError('');
+    try {
+      const c = await addCartItem(id);
+      setCart(c);
+      setNotice('Added to cart');
+      setCartDropdown(true);
+    } catch (e) {
+      setCartError(String(e));
+      setNotice('Could not add offer: ' + (e instanceof Error ? e.message : String(e)));
+    } finally {
+      setCartBusy(false);
+    }
+  }
+  async function removeOffer(id: number) {
+    setCartBusy(true);
+    try {
+      setCart(await removeCartItem(id));
+    } catch (e) {
+      setCartError(String(e));
+    } finally {
+      setCartBusy(false);
+    }
+  }
+  /**
+   * Simulated checkout uses a stable idempotency key for retries, so a
+   * repeated request should resolve to the same order on the Go backend.
+   */
+  async function pay() {
+    if (!account || !cart?.items.length) return;
+    setPaymentBusy(true);
+    setCartError('');
+    const key = checkoutKey ?? crypto.randomUUID();
+    setCheckoutKey(key);
+    try {
+      const receipt = await checkout(key);
+      setCheckoutKey(null);
+      setCart({ items: [], totalCents: 0, currency: 'EUR' });
+      setSelectedOrder(receipt);
+      setOrderID(receipt.id);
+      navigate('order', String(receipt.id));
+      setNotice('Demo payment successful. Your keys are ready.');
+    } catch (e) {
+      setCartError(String(e));
+    } finally {
+      setPaymentBusy(false);
+    }
+  }
+  useEffect(() => {
+    if (view !== 'cart' || !account || !cart?.items.length) {
+      setSuggestions([]);
+      return;
+    }
+    const controller = new AbortController();
+    setSuggestionLoading(true);
+    fetchProducts({ ...DEFAULT, pageSize: 24, sort: 'name_asc' }, controller.signal)
+      .then(page => setSuggestions(page.items.filter(p => !cart.items.some(item => item.slug === p.slug)).slice(0, 5)))
+      .catch(() => {
+        if (!controller.signal.aborted) setSuggestions([]);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setSuggestionLoading(false);
+      });
+    return () => controller.abort();
+  }, [view, account, cart?.items.map(item => item.slug).join('|')]);
+  // Keep the user's filters in state; results are loaded by the effect below.
+  const update = (next: Partial<Filters>) => setFilters(f => ({ ...f, ...next, page: next.page ?? 1 }));
+  useEffect(() => {
+    if (view !== 'store') return;
+    const c = new AbortController();
+    setLoading(true);
+    setError('');
+    const timer = window.setTimeout(() => fetchProducts(filters, c.signal).then(setResults).catch(e => {
+      if (!c.signal.aborted) setError(String(e));
+    }).finally(() => {
+      if (!c.signal.aborted) setLoading(false);
+    }), 180);
+    return () => {
+      window.clearTimeout(timer);
+      c.abort();
+    };
+  }, [view, filters]);
+  useEffect(() => {
+    if (view !== 'product' || !slug) return;
+    const c = new AbortController();
+    setProduct(null);
+    setOffers([]);
+    setCartError('');
+    setSelectedOfferId(null);
+    setDetailError('');
+    setDetailLoading(true);
+    Promise.all([fetchProduct(slug, c.signal), fetchOffers(slug, c.signal)]).then(([p, o]) => {
+      setProduct(p);
+      setOffers(o);
+      try {
+        const old = JSON.parse(localStorage.getItem('eneba-demo-recently-viewed') || '[]');
+        const list = Array.isArray(old) ? old.filter(x => typeof x === 'string' && x !== p.slug) : [];
+        localStorage.setItem('eneba-demo-recently-viewed', JSON.stringify([p.slug, ...list].slice(0, 12)));
+      } catch { }
+    }).catch(e => {
+      if (!c.signal.aborted) setDetailError(String(e));
+    }).finally(() => {
+      if (!c.signal.aborted) setDetailLoading(false);
+    });
+    return () => c.abort();
+  }, [view, slug]);
+  const applyPrices = () => {
+    const minimum = minInput.trim() === '' ? undefined : Math.round(Number(minInput) * 100), maximum = maxInput.trim() === '' ? undefined : Math.round(Number(maxInput) * 100);
+    if ((minimum !== undefined && (!Number.isFinite(minimum) || minimum < 0)) || (maximum !== undefined && (!Number.isFinite(maximum) || maximum < 0)) || (minimum !== undefined && maximum !== undefined && minimum > maximum)) {
+      setError('Enter valid prices: minimum must not exceed maximum.');
+      return;
+    }
+    setError('');
+    update({ minPriceCents: minimum, maxPriceCents: maximum });
+  };
+  const clear = () => {
+    setFilters(DEFAULT);
+    setMinInput('');
+    setMaxInput('');
+    setError('');
+  };
+  // Render: global header/popovers followed by the active screen and footer.
+  return <div className="site-shell">
+    {view === 'cart' ? <header className="checkout-header">
+      <div className="container checkout-header-inner">
+        <button className="brand eneba-brand" onClick={homeView} aria-label="Return to homepage">
+          <img src="https://static.eneba.games/branding/v2/logoFull.svg" alt="Eneba logo" width="152" height="48" />
+        </button>
+        <nav className="checkout-steps" aria-label="Checkout progress">
+          <span className="step-current"><b>1</b> Cart</span>
+          <i />
+          <span><b>2</b> Payment</span>
+          <i />
+          <span><b>3</b> Get your product</span>
+        </nav>
+        <button className="locale" type="button" onClick={openLocale}><img
+          className="locale-flag locale-flag-image"
+          src={localeFlagSrc(localePreferences.region)}
+          alt={`${localePreferences.region} flag`}
+          width={16}
+          height={16} /> {localePreferences.language} | {localePreferences.currency}</button>
+      </div>
+    </header> : <header className="site-header">
+      <div className="topbar container">
+
+        <button className="brand eneba-brand" onClick={homeView} aria-label="Eneba demo home">
+          <img src="https://static.eneba.games/branding/v2/logoFull.svg" alt="Eneba logo" width="160" height="50" decoding="async" />
+        </button>
+
+        <label className="search-wrap">
+          <span className="search-icon">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              aria-hidden="true">
+              <circle cx="10.8" cy="10.8" r="7.3" />
+              <path d="m16.3 16.3 5.1 5.1" />
+            </svg>
+          </span>
+          <input
+            placeholder="Search for games, top-ups and more"
+            aria-label="Search for products"
+            value={filters.q}
+            onChange={e => {
+              const q = e.target.value;
+              setFilters({ ...DEFAULT, q, sort: q.trim() ? 'relevance' : 'name_asc' });
+              setMinInput('');
+              setMaxInput('');
+              setResults(null);
+              setError('');
+              if (q.trim() && view !== 'store') navigate('store');
+            }}
+            onKeyDown={e => {
+              if (e.key === 'Enter') store();
+            }} />
+        </label>
+
+        <button className="locale" type="button" title="Change region, language and currency" onClick={openLocale}><img
+          className="locale-flag locale-flag-image"
+          src={localeFlagSrc(localePreferences.region)}
+          alt={`${localePreferences.region} flag`}
+          width={16}
+          height={16} /> {localePreferences.language} | {localePreferences.currency}</button>
+
+        <button
+          className="top-icon heart-header"
+          title="Wishlist (demo)"
+          onClick={() => setNotice('Wishlist is not part of this internship demo yet')}
+          aria-label="Wishlist">
+          <HeartIcon width={27} height={27} />
+        </button>
+
+        <div className="cart-control">
+          <button
+            className="top-icon cart-icon"
+            aria-haspopup="dialog"
+            aria-expanded={cartDropdown}
+            onClick={() => {
+              setCartError('');
+              setCartDropdown(v => !v);
+              if (account) getCart().then(setCart).catch(e => setCartError(String(e)));
+            }}
+            aria-label="Open shopping cart">
+            <CartIcon className="header-cart-svg" width={29} height={29} />
+            {Boolean(cart?.items.length) && <span className="cart-count">{cart?.items.length}</span>}
+          </button>
+        </div>
+
+        <div className="user-menu">
+          <button
+            className="avatar-button"
+            aria-label={account ? 'Account menu' : 'Sign in'}
+            title={account?.email ?? 'Log in / register'}
+            onClick={() => account ? navigate('orders') : openAuth('login')}>♙</button>
+          {account && <button className="logout-compact" onClick={signOut}>Log out</button>}
+        </div>
+      </div> <div className="nav-band">
+        <nav className="container nav-links" aria-label="Main navigation">
+          <button onClick={store}>☰ &nbsp; Categories</button>
+          <button onClick={store}>Cheap Games</button>
+          <button onClick={store}>Software</button>
+          <button onClick={store}>eGift Cards</button>
+          <button onClick={store}>Eneba Gift Cards</button>
+          <button onClick={store}>Giveaway</button>
+          <button onClick={store}>GTA <img className="gta-menu-vi" src="https://static.eneba.games/0df22079f978caa1f11a.png" alt="VI" decoding="async" /></button>
+          <button className="special-link black-week" onClick={store}>BLACK WEEK</button>
+        </nav>
+      </div>
+    </header>}
+
+    {localeOpen && <div className="locale-overlay" onMouseDown={e => {
+      if (e.target === e.currentTarget) setLocaleOpen(false);
+    }}>
+
+      <section className="locale-dialog" role="dialog" aria-modal="true" aria-labelledby="locale-title">
+
+        <button type="button" className="locale-close" onClick={() => setLocaleOpen(false)} aria-label="Close settings">×</button>
+
+        <h2 id="locale-title">Update your settings</h2>
+        <p>Set your preferred region, language, and the currency.</p>
+
+        <label>Region<select value={localeDraft.region} onChange={e => setLocaleDraft(v => ({ ...v, region: e.target.value }))}>
+          <option value="Lithuania">🇱🇹 Lithuania</option>
+          <option value="Germany">🇩🇪 Germany</option>
+          <option value="United Kingdom">🇬🇧 United Kingdom</option>
+          <option value="United States">🇺🇸 United States</option>
+        </select></label>
+
+        <label>Language<select value={localeDraft.language} onChange={e => setLocaleDraft(v => ({ ...v, language: e.target.value }))}>
+          <option value="English EU">English EU</option>
+          <option value="English US">English US</option>
+          <option value="English UK">English UK</option>
+        </select></label>
+
+        <label>Currency<select value={localeDraft.currency} onChange={e => setLocaleDraft(v => ({ ...v, currency: e.target.value }))}>
+          <option value="EUR">Euro (€)</option>
+          <option value="USD">US Dollar ($)</option>
+          <option value="GBP">Pound Sterling (£)</option>
+        </select></label>
+
+        <p className="locale-note">Display preferences only; demo checkout remains in EUR and the interface is currently in English.</p>
+
+        <div className="locale-actions">
+          <button type="button" className="locale-cancel" onClick={() => setLocaleOpen(false)}>Cancel</button>
+          <button type="button" className="locale-save" onClick={saveLocale}>Save</button>
+        </div>
+
+      </section>
+
+    </div>}
+
+    {cartDropdown && <>
+      <button className="cart-popover-scrim" type="button" aria-label="Close shopping cart" onClick={() => setCartDropdown(false)} />
+      <section className="cart-popover" role="dialog" aria-label="My shopping cart">
+        <div className="cart-popover-header">
+          <h2>My shopping cart</h2>
+          <button type="button" aria-label="Close shopping cart" onClick={() => setCartDropdown(false)}>×</button>
+        </div>
+        {cartError && <p className="cart-popover-error" role="alert">{cartError}</p>}
+        {!account ? <div className="cart-popover-empty">
+          <div className="empty-info-icon">i</div>
+          <h3>Sign in to view your cart</h3>
+          <p>Choose products and sign in to continue.</p>
+          <button className="yellow-button" onClick={() => {
+            setCartDropdown(false);
+            openAuth('login');
+          }}>Sign in</button>
+        </div> : !cart?.items.length ? <div className="cart-popover-empty">
+          <div className="empty-info-icon">i</div>
+          <h3>Your shopping cart is empty</h3>
+          <p>It seems you haven't chosen your products yet</p>
+        </div> : <>
+          <div className="cart-popover-items">
+            {cart.items.map(item => <div className="cart-popover-item" key={item.offerId}>
+              <div className="cart-popover-thumb">
+                {item.coverImageUrl && <img src={item.coverImageUrl} alt="" />}
+              </div>
+              <div className="cart-popover-info">
+                <div className="popover-seller">🎮 &nbsp; {item.seller}</div>
+                <strong>{item.title} ({item.platform}) Key {item.region}</strong>
+                <small>Digital product ⓘ</small>
+                <div className="popover-item-bottom">
+                  <span className="popover-quantity"><button type="button" title="Remove offer" disabled={cartBusy} onClick={() => removeOffer(item.offerId)}>−</button> 1 <button type="button" title="One key per offer in this demo" disabled>+</button></span>
+                  <b>{euro(item.priceCents, item.currency)}</b>
+                </div>
+                <span className="popover-cashback">Cashback: {euro(Math.round(item.priceCents * item.cashbackPercent / 100), item.currency)} <small>(illustrative)</small></span>
+              </div>
+              <button
+                className="popover-remove"
+                type="button"
+                aria-label={`Remove ${item.title}`}
+                disabled={cartBusy}
+                onClick={() => removeOffer(item.offerId)}>
+                <svg
+                  width="21"
+                  height="21"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true">
+                  <path d="M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 10v7M14 10v7" />
+                </svg>
+              </button>
+            </div>)}
+          </div>
+          <div className="cart-popover-summary">
+            <div className="popover-fee">Service fee: <span>— ⓘ</span></div>
+            <div className="popover-total">Total <strong>{euro(cart.totalCents, cart.currency)}</strong></div>
+            <span className="popover-cashback-total">Demo cashback: {euro(cart.items.reduce((sum, item) => sum + Math.round(item.priceCents * item.cashbackPercent / 100), 0), cart.currency)}</span>
+            <button className="cart-popover-primary" type="button" onClick={() => navigate('cart')}>View cart</button>
+            <button className="cart-popover-secondary" type="button" onClick={() => navigate('cart')}>Checkout now</button>
+            <p>Simulated checkout · no real money charged</p>
+          </div>
+        </>}
+      </section>
+    </>}
+
+    {notice && <div
+      className={`toast toast-floating ${/^(Could not|Error|Failed|\bError:)/i.test(notice) ? 'toast-error' : 'toast-success'}`}
+      role="status"
+      aria-live="polite">
+      {notice}
+      <button aria-label="Dismiss notification" onClick={() => setNotice('')}>×</button>
+    </div>}
+
+    {view === 'home' ? <Homepage
+      onBrowse={store}
+      onOpen={openProduct}
+      onAdd={p => {
+        fetchOffers(p.slug).then(available => {
+          if (available.length) addOffer(available[0].id); else setNotice('No seller offers are available for this product.');
+        }).catch(e => setNotice(`Could not find a seller offer: ${String(e)}`));
+      }}
+      onWish={p => setNotice(`${p.title}: wishlist is not available in this demo yet`)} />
+      : view === 'store' ? <main className="container store-view">
+        <div className="breadcrumb"><button onClick={homeView}>Home</button><span>›</span>Games</div>
+        <div className="store-head">
+          <h1>Games</h1>
+          <p>Explore offers from different sellers. Search even with incomplete names or typos.</p>
+        </div>
+
+        <div className="store-layout">
+          <aside className="filter-panel">
+            <h2>Filters</h2>
+            <label>Platform<select value={filters.platform} onChange={e => update({ platform: e.target.value })}>
+              <option value="">All platforms</option>
+              <option value="PC">PC</option>
+              <option value="Xbox">Xbox</option>
+              <option value="Switch">Switch</option>
+            </select></label>
+
+            <label>Region<select value={filters.region} onChange={e => update({ region: e.target.value })}>
+              <option value="">All regions</option>
+              <option value="GLOBAL">Global</option>
+              <option value="EU">Europe</option>
+              <option value="US">United States</option>
+            </select></label>
+
+            <label>Minimum price (€)<input type="number" min="0" step="0.01" placeholder="0.00" value={minInput} onChange={e => setMinInput(e.target.value)} /></label>
+
+            <label>Maximum price (€)<input type="number" min="0" step="0.01" placeholder="50.00" value={maxInput} onChange={e => setMaxInput(e.target.value)} /></label>
+
+            <button className="apply-button" onClick={applyPrices}>Apply price</button>
+            <button className="clear-button" onClick={clear}>Clear filters</button>
+          </aside>
+
+          <div className="store-results">
+            <div className="results-header">
+              <span>{loading ? 'Loading…' : `${results?.total ?? 0} games found`}</span>
+              <label>Sort by <select value={filters.sort} onChange={e => update({ sort: e.target.value })}>
+                <option value="name_asc">Name A–Z</option>
+                <option value="name_desc">Name Z–A</option>
+                <option value="price_asc">Price low to high</option>
+                <option value="price_desc">Price high to low</option>
+                <option value="relevance">Best match</option>
+              </select></label>
+            </div>
+
+            {error ? <div className="notice error">{error}</div> : loading ? <div className="notice">Loading games from PostgreSQL…</div> : !results?.items?.length ? <div className="notice">No games found for {filters.q.trim() ? `“${filters.q.trim()}”` : 'these filters'}. <button className="clear-button" onClick={clear}>Clear search and filters</button></div> : <>
+              <div className="cards-grid">
+                {(results?.items ?? []).map(p => <ProductCard
+                  key={p.id}
+                  product={p}
+                  onOpen={openProduct}
+                  onAdd={item => {
+                    fetchOffers(item.slug).then(available => {
+                      if (available.length) addOffer(available[0].id); else setNotice('No offers available');
+                    }).catch(e => setNotice(String(e)));
+                  }}
+                  onWish={item => setNotice(`${item.title}: wishlist is not implemented in this demo`)} />)}
+              </div>
+              <nav className="pagination" aria-label="Catalog pagination">
+                <button disabled={filters.page <= 1} onClick={() => update({ page: filters.page - 1 })}>← Previous</button>
+                <span>Page {results.page} of {Math.max(1, results.totalPages)}</span>
+                <button disabled={filters.page >= results.totalPages} onClick={() => update({ page: filters.page + 1 })}>Next →</button>
+              </nav>
+            </>}
+
+          </div>
+        </div>
+      </main> : view === 'product' ? <main className="container product-view">
+        <div className="breadcrumb">
+          <button onClick={homeView}>Home</button>
+          <span>›</span>
+          <button onClick={store}>Games</button>
+          <span>›</span>
+          {product?.title || slug}
+        </div>
+
+        {detailLoading ? <div className="notice">Loading product and seller offers…</div> : detailError ? <div className="notice error">{detailError}</div> : product ? <ProductDetail
+          product={product}
+          offers={offers}
+          busy={cartBusy}
+          error={cartError}
+          onAdd={addOffer}
+          onCart={() => navigate('cart')}
+          onSignIn={() => openAuth('login')}
+          authenticated={Boolean(account)}
+          onNotice={setNotice} /> : null}
+      </main> : null}
+
+    {view === 'cart' && <main className="container commerce-page checkout-page">
+      <h1 className="checkout-page-title">My cart</h1>
+      {cartError && <p role="alert" className="form-error">{cartError}</p>}
+      {!account ? <div className="notice">Your cart is available after you sign in. <button onClick={() => openAuth('login')}>Log in</button> or <button onClick={() => openAuth('register')}>create an account</button>.</div> : <>
+        <div className="checkout-layout">
+          <div className="checkout-left">
+            <section className="commerce-panel checkout-items-panel">
+              <h2>My cart</h2>
+              {!cart ? <div className="notice">Loading cart…</div> : cart.items.length === 0 ? <div className="empty-state">
+                <h2>Your shopping cart is empty</h2>
+                <p>Choose a seller offer to get started.</p>
+                <button className="yellow-button" onClick={store}>Browse games</button>
+              </div> : cart.items.map(item => <div className="cart-row checkout-item" key={item.offerId}>
+                <button className="cart-thumb checkout-thumb" onClick={() => openProduct(item.slug)} aria-label={`View ${item.title}`}>
+                  {item.coverImageUrl && <img src={item.coverImageUrl} alt="" />}
+                </button>
+                <div className="cart-info">
+                  <small className="checkout-seller">Sold by <strong>{item.seller}</strong></small>
+                  <h3>{item.title} ({item.platform}) Key {item.region}</h3>
+                  <p>Digital product ⓘ</p>
+                  <span className="checkout-quantity">− &nbsp; 1 &nbsp; + <small>(one key per offer)</small></span>
+                  <span className="checkout-item-cashback">Demo cashback: {euro(Math.round(item.priceCents * item.cashbackPercent / 100), item.currency)}</span>
+                  {!item.available && <span className="stock-warning">Offer no longer available</span>}
+                </div>
+                <div className="checkout-item-end">
+                  <button className="checkout-wish" onClick={() => setNotice('Wishlist is not available in this demo')} aria-label="Wishlist">
+                    <HeartIcon width={19} height={19} />
+                  </button>
+                  <button className="checkout-remove" onClick={() => removeOffer(item.offerId)} disabled={cartBusy} aria-label="Remove product">×</button>
+                  <strong>{euro(item.priceCents, item.currency)}</strong>
+                </div>
+              </div>)}
+            </section>
+            <section className="support-panel">
+              <button type="button" className="support-heading" onClick={() => setSupportExpanded(v => !v)} aria-expanded={supportExpanded}>
+                <span>💙 &nbsp; Let's support freedom <small>ⓘ</small></span>
+                <span>{supportExpanded ? '⌃' : '⌄'}</span>
+              </button>
+              {supportExpanded && <div className="support-content">
+                <p>Choose an optional demonstration pledge in support of humanitarian relief in Ukraine. No donation or payment is collected.</p>
+                <div className="support-amounts">
+                  {[50, 100, 200, 500, 1000].map(amount => <button
+                    key={amount}
+                    className={demoSupport === amount ? 'chosen' : ''}
+                    onClick={() => setDemoSupport(old => old === amount ? null : amount)}
+                    type="button">
+                    {euro(amount)}
+                  </button>)}
+                </div>
+                {demoSupport !== null && <p className="support-note">Selected: {euro(demoSupport)} — for display only, not included in your total.</p>}
+              </div>}
+            </section>
+          </div>
+          <aside className="summary-panel checkout-summary">
+            <h2>Summary</h2>
+            <button
+              className="yellow-button full"
+              onClick={pay}
+              disabled={paymentBusy || !cart?.items.length || cart.items.some(i => !i.available)}>
+              {paymentBusy ? 'Processing…' : 'Proceed to checkout'}
+            </button>
+            <div className="summary-line">
+              <span>{cart?.items.length ?? 0} product(s)</span>
+              <b>{euro(cart?.totalCents ?? 0)}</b>
+            </div>
+            <div className="summary-line"><span>Service fee ⓘ</span><span>—</span></div>
+            <div className="summary-line total">
+              <strong>Total:</strong>
+              <b>{euro(cart?.totalCents ?? 0)}</b>
+            </div>
+            <div className="checkout-cashback">Demo cashback: {euro((cart?.items ?? []).reduce((sum, item) => sum + Math.round(item.priceCents * item.cashbackPercent / 100), 0))}</div>
+            <label className="checkout-consent"><input type="checkbox" /> Send optional invitation to review my experience (demo only)</label>
+            <details className="discount-demo">
+              <summary>Got discount code?</summary>
+              <p>Discount codes are not available in this demo.</p>
+            </details>
+            <p className="checkout-disclaimer">Simulated payment only. No real charges, donations, or emails.</p>
+          </aside>
+        </div>
+        {cart?.items.length ? <section className="inspired-section">
+          <h2>Inspired by your picks <span className="round-info">i</span></h2>
+          {suggestionLoading ? <p>Loading suggestions…</p> : suggestions.length ? <div className="inspired-grid">
+            {suggestions.map(p => <ProductCard
+              key={p.id}
+              product={p}
+              onOpen={openProduct}
+              onAdd={item => fetchOffers(item.slug).then(offers => offers.length ? addOffer(offers[0].id) : setNotice('No seller offers available')).catch(e => setNotice(String(e)))}
+              onWish={item => setNotice(`${item.title}: wishlist is not implemented`)} />)}
+          </div> : <p>More suggestions will appear when other products are available.</p>}
+        </section> : null}
+      </>}
+    </main>}
+
+    {view === 'orders' && <main className="container commerce-page">
+      <div className="breadcrumb"><button onClick={homeView}>Home</button><span>›</span>Orders</div>
+      <h1>My orders</h1>
+      {cartError && <p className="form-error">{cartError}</p>}
+      {orders.length === 0 ? <div className="empty-state">
+        <h2>No orders yet</h2>
+        <p>Your purchased digital keys will appear here.</p>
+        <button className="yellow-button" onClick={store}>Browse games</button>
+      </div> : <div className="order-list">
+        {orders.map(o => <button
+          key={o.id}
+          className="order-list-row"
+          onClick={() => {
+            setOrderID(o.id);
+            setSelectedOrder(null);
+            navigate('order', String(o.id));
+          }}>
+          <span>
+            <strong>Order #{o.id}</strong>
+            <small>{new Date(o.createdAt).toLocaleString()}</small>
+          </span>
+          <span className="paid-label">Paid · Demo</span>
+          <strong>{euro(o.totalCents, o.currency)} →</strong>
+        </button>)}
+      </div>}
+    </main>}
+
+    {view === 'order' && <main className="container commerce-page">
+      <div className="breadcrumb"><button onClick={() => navigate('orders')}>My orders</button><span>›</span>Order #{orderID}</div>
+      {!selectedOrder || selectedOrder.id !== orderID ? <div className="notice">Loading your order… {cartError}</div> : <>
+        <div className="order-success">
+          <span>✓</span>
+          <div>
+            <h1>Payment simulated successfully!</h1>
+            <p>Order #{selectedOrder.id} · {new Date(selectedOrder.createdAt).toLocaleString()}</p>
+            <p>No real payment was processed. These are demonstration keys.</p>
+          </div>
+        </div>
+        <section className="commerce-panel">
+          <h2>Your digital keys</h2>
+          {selectedOrder.items?.map(i => <div className="delivered-item" key={i.id}>
+            <div>
+              <h3>{i.title}</h3>
+              <p>{i.platform} · {i.region} · {i.seller}</p>
+              <strong>{euro(i.priceCents, i.currency)}</strong>
+            </div>
+            <div className="key-box">
+              <span>DEMO DIGITAL KEY</span>
+              <code>{i.key}</code>
+              <button onClick={() => navigator.clipboard.writeText(i.key).then(() => setNotice('Key copied')).catch(() => setNotice('Unable to copy key'))}>Copy key</button>
+            </div>
+          </div>)}
+        </section>
+        <button className="subtle-button" onClick={() => navigate('orders')}>← Back to orders</button>
+      </>}
+    </main>}
+
+    {authOpen && <div className="modal-backdrop" onMouseDown={e => {
+      if (e.target === e.currentTarget) setAuthOpen(false);
+    }}>
+      <section className="auth-modal" role="dialog" aria-modal="true" aria-label={authMode === 'login' ? 'Log in' : 'Register'}>
+        <button className="modal-close" onClick={() => setAuthOpen(false)} aria-label="Close">×</button>
+        <div className="auth-heading">
+          <span className="auth-emblem">✦</span>
+          <h2>{authMode === 'login' ? 'Welcome back' : 'Create your account'}</h2>
+          <p>
+            {authMode === 'login' ? 'Log in to manage your games and orders.' : 'Join our Eneba-inspired demo to discover great game offers.'}
+          </p>
+        </div>
+        <div className="auth-tabs">
+          <button className={authMode === 'login' ? 'active' : ''} onClick={() => {
+            setAuthMode('login');
+            setAuthError('');
+          }}>Log in</button>
+          <button className={authMode === 'register' ? 'active' : ''} onClick={() => {
+            setAuthMode('register');
+            setAuthError('');
+          }}>Register</button>
+        </div>
+        <form onSubmit={submitAuth} className="auth-form">
+          <label>Email address<input
+            autoComplete="email"
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            required /></label>
+          <label>Password<input
+            autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            minLength={authMode === 'register' ? 8 : undefined}
+            required
+            placeholder="At least 8 characters" /></label>
+          {authError && <p role="alert" className="form-error">{authError}</p>}
+          <button className="yellow-button full" type="submit" disabled={authBusy}>
+            {authBusy ? 'Please wait…' : authMode === 'login' ? 'Log in →' : 'Create account →'}
+          </button>
+        </form>
+        <p className="auth-footnote">Educational marketplace demo · No real purchases.</p>
+      </section>
+    </div>}
+
+    <div className="payment-strip">
+      <div className="container payment-logos">
+        <strong>ENEBA WALLET</strong>
+        <b>VISA</b>
+        <b>Mastercard</b>
+        <b>PayPal</b>
+        <b>Apple Pay</b>
+        <b>G Pay</b>
+        <b>Crypto</b>
+      </div>
+    </div>
+
+    <footer className="footer eneba-footer">
+      <div className="container">
+
+        <div className="footer-columns">
+          {[
+            ['About Eneba', 'About us', 'Contact', 'Careers', 'Transparency'],
+            ['Buy', 'How to buy', 'Collections', 'Discounts', 'Loyalty'],
+            ['Help', 'FAQ', 'Activate a game', 'Support', 'Return policy'],
+            ['Community', 'Gaming news', 'Giveaways', 'Affiliates', 'Events'],
+            ['Business', 'Sell on marketplace', 'Advertise', 'Partners', 'Developers']
+          ].map(group => <div key={group[0]} className="footer-column">
+            <strong>{group[0]}</strong>
+            {group.slice(1).map(item => <span key={item}>{item}</span>)}
+          </div>)}
+        </div>
+
+        <div className="footer-social">
+          <div><strong>Follow us</strong><p>f &nbsp; 𝕏 &nbsp; ◎ &nbsp; ◈ &nbsp; ●</p></div>
+          <div><strong>Download the app</strong><p>App Store &nbsp; · &nbsp; Google Play</p></div>
+          <div>
+            <strong>Customer reviews</strong>
+            <p>★★★★★ <span>Demo presentation · not a verified Trustpilot score</span></p>
+          </div>
+        </div>
+
+        <div className="footer-newsletter">
+          <div>
+            <strong>Get personalized game deals</strong>
+            <p>Sign up for news about our demo marketplace.</p>
+          </div>
+          <form onSubmit={e => {
+            e.preventDefault();
+            setNotice('Newsletter demo: no email was saved');
+          }}>
+            <input aria-label="Newsletter email" type="email" required placeholder="Enter your email" />
+            <button className="yellow-button">Subscribe</button>
+          </form>
+          <span>🇪🇺 English EU | EUR</span>
+        </div>
+
+        <div className="footer-legal">Eneba-inspired educational demo · Not affiliated with or endorsed by Eneba. No real transactions, email subscriptions or reviews.</div>
+
+      </div>
+    </footer>
+  </div>;
 }
